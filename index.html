@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D&D 5e — Ficha de Personagem</title>
+<link href="https://fonts.googleapis.com/css2?family=Scada:ital,wght@0,400;0,700;1,400&family=Cuprum:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow-x:hidden;}
+.app-wrap{background:#c8bfb0;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:14px;align-items:center;padding:8px 16px;background:#111;position:sticky;top:0;z-index:100;flex-wrap:wrap;min-height:52px;}
+.toolbar-title{color:#aaa;font-size:11.8px;letter-spacing:2px;text-transform:uppercase;flex:1 1 auto;min-width:200px;white-space:nowrap;}
+.toolbar-group{display:flex;flex-direction:column;gap:4px;}
+.tbtn{font-size:11.8px;letter-spacing:1px;padding:0;border:1px solid #444;border-radius:2px;cursor:pointer;font-family:inherit;text-transform:uppercase;white-space:nowrap;width:110px;height:24px;line-height:1;text-align:center;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;}
+.tbtn-save{background:#222;color:#ccc;}.tbtn-save:hover{background:#2e2e2e;}
+.tbtn-print{background:#fff;color:#000;}.tbtn-print:hover{background:#eee;}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#111;padding:0 14px;border-bottom:2px solid #333;flex-wrap:wrap;}
+.tab-btn{font-family:inherit;font-size:11.8px;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;background:transparent;color:#666;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .15s;margin-bottom:-2px;}
+.tab-btn.active{color:#fff;border-bottom-color:#fff;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── PAGES ── */
+.pages{padding:14px;display:flex;flex-direction:column;gap:14px;align-items:center;}
+
+/* ── A4 PAGE ── */
+.page{background:#fff;width:794px;min-height:1650px;box-shadow:0 2px 18px rgba(0,0,0,.4);position:relative;transform-origin:top center;flex-shrink:0;}
+.page-border{position:absolute;inset:7px;border:1.5px solid #000;pointer-events:none;z-index:0;}
+.page-inner{position:relative;z-index:1;padding:12px 12px 10px;}
+
+/* ── D&D HEADER BAND ── */
+.dnd-band{display:flex;align-items:stretch;gap:0;border-bottom:2.5px solid #000;padding-bottom:6px;margin-bottom:6px;}
+.dnd-logo-block{display:flex;align-items:center;gap:6px;border-right:2px solid #000;padding-right:10px;margin-right:10px;flex-shrink:0;}
+.dnd-dragon{font-size:30.7px;line-height:1;}
+.dnd-text{font-size:11.8px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;line-height:1.4;color:#000;font-family:'Cuprum',sans-serif;white-space:nowrap;}
+.dnd-text small{font-size:8.3px;letter-spacing:2px;display:block;font-weight:400;}
+.header-fields-wrap{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0;}
+.hrow{display:grid;gap:0 8px;align-items:end;}
+.hrow-1{grid-template-columns:2fr 0.7fr 1fr 1fr;}
+.hrow-2{grid-template-columns:2fr 1.2fr 1fr 1fr;}
+
+/* ── UNDERLINE FIELD ── */
+.uf-split{display:flex;gap:8px;min-width:0;}
+.uf{display:flex;flex-direction:column;gap:0;min-width:0;}
+#classe2_wrap.locked select{cursor:not-allowed;color:#aaa;border-bottom-color:#ccc;}
+#classe2_wrap.locked label{color:#999;}
+#classe2_wrap:not(.locked) label{color:#000;}
+#classe2_info{font-size:8.3px;color:#555;padding:2px 0 0;line-height:1.4;}
+.uf label{font-size:7.1px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.uf input,.uf textarea,.uf select{background:transparent;border:none;border-bottom:1px solid #000;font-family:'Cuprum',sans-serif;font-size:15.3px;color:#000;padding:1px 2px;width:100%;outline:none;}
+.uf select{appearance:none;-webkit-appearance:none;cursor:pointer;}
+.uf textarea{resize:none;}
+
+/* ── SECTION LABEL ── */
+.slabel{font-size:7.7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;text-align:left;display:block;margin-bottom:4px;}
+
+/* ── 3-COL MAIN ── */
+.main3{display:grid;grid-template-columns:97px minmax(0,1fr) 203px;gap:5px;align-items:stretch;}
+
+/* ── LEFT: ATTR COL ── */
+.attr-col{display:flex;flex-direction:column;gap:7px;min-width:0;}
+.insp-row{border:1.5px solid #000;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 4px;}
+.insp-cb{width:21px;height:21px;border:1.5px solid #000;border-radius:2px;appearance:none;-webkit-appearance:none;cursor:pointer;background:#fff;flex-shrink:0;}
+.insp-cb:checked{background:#000;}
+.prof-box{border:1.5px solid #000;display:flex;flex-direction:column;align-items:center;padding:4px 4px 3px;}
+.prof-val{font-size:21.2px;font-weight:700;background:transparent;border:none;border-bottom:1.5px solid #000;text-align:center;width:61px;outline:none;font-family:'Cuprum',sans-serif;color:#000;display:block;padding:0;}
+.attr-block{border:1.5px solid #000;display:flex;flex-direction:column;align-items:center;padding:3px 2px 4px;background:#fff;}
+.attr-name-lbl{font-size:7.1px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#000;margin-bottom:2px;text-align:center;}
+.attr-score-box{border:1.5px solid #000;width:61px;height:59px;display:flex;align-items:center;justify-content:center;background:#f8f8f8;clip-path:polygon(8px 0%,calc(100% - 8px) 0%,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0% calc(100% - 8px),0% 8px);}
+.attr-score{font-size:28.3px;font-weight:700;color:#000;background:transparent;border:none;outline:none;text-align:center;width:54px;font-family:'Cuprum',sans-serif;}
+.attr-mod-circle{margin-top:-1px;border:1.5px solid #000;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:14.2px;font-weight:700;font-family:'Cuprum',sans-serif;color:#000;background:#fff;position:relative;z-index:2;}
+.attr-mod-lbl{font-size:5.9px;letter-spacing:0.5px;text-transform:uppercase;color:#555;margin-top:3px;}
+
+/* ── MID COL ── */
+.mid-col{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.listbox{border:1.5px solid #000;padding:4px 5px;background:#fff;overflow:hidden;}
+.list-row{display:flex;align-items:center;gap:6px;padding:1.5px 0;border-bottom:1px solid #f0f0f0;}
+.list-row:last-child{border-bottom:none;}
+.circle-cb{width:10px;height:10px;border:1.5px solid #000;border-radius:50%;appearance:none;-webkit-appearance:none;cursor:pointer;background:#fff;flex-shrink:0;}
+.circle-cb:checked{background:#000;}
+.list-bonus{font-size:10px;font-weight:700;background:transparent;border:none;border-bottom:1px solid #ddd;text-align:center;width:24px;outline:none;font-family:'Cuprum',sans-serif;color:#000;flex-shrink:0;}
+.list-bonus.auto-calc{border-bottom-color:#999;color:#000;}
+.list-bonus.user-edit{border-bottom-color:#c00;color:#c00;}
+.list-name{font-size:9px;color:#000;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.list-attr{font-size:7.5px;color:#777;flex-shrink:0;white-space:nowrap;}
+.passive-box{border:1.5px solid #000;display:flex;align-items:center;gap:8px;padding:4px 6px;}
+.passive-num-box{border:1.5px solid #000;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.passive-in{font-size:18.9px;font-weight:700;background:transparent;border:none;outline:none;text-align:center;width:33px;font-family:'Cuprum',sans-serif;color:#000;}
+.lined-box{border:1.5px solid #000;padding:4px 5px;}
+.big-ta{background:transparent;border:none;outline:none;resize:none;font-family:'Cuprum',sans-serif;font-size:14.2px;color:#000;width:100%;line-height:1.55;overflow:auto;}
+.lined-bg{background-image:repeating-linear-gradient(transparent,transparent 14px,#ddd 14px,#ddd 15px);background-size:100% 15px;}
+
+/* ── RIGHT COL ── */
+.right-col{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.combat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;}
+.combat-cell{border:1.5px solid #000;display:flex;flex-direction:column;align-items:center;padding:3px 2px 3px;min-width:0;}
+.combat-in{font-size:16.5px;font-weight:700;background:transparent;border:none;border-bottom:1.5px solid #000;text-align:center;width:100%;outline:none;font-family:'Cuprum',sans-serif;color:#000;min-width:0;}
+.hp-block{border:1.5px solid #000;padding:4px 5px;}
+.hp-max-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;}
+.hp-max-in{font-size:15.3px;font-weight:700;background:transparent;border:none;border-bottom:1px solid #000;outline:none;width:59px;font-family:'Cuprum',sans-serif;color:#000;}
+.hp-big{font-size:23.6px;font-weight:700;width:100%;background:transparent;border:none;border-bottom:2px solid #000;outline:none;text-align:center;padding:2px 0;font-family:'Cuprum',sans-serif;color:#000;}
+.hp-med{font-size:18.9px;font-weight:700;width:100%;background:transparent;border:none;border-bottom:1.5px solid #000;outline:none;text-align:center;padding:2px 0;font-family:'Cuprum',sans-serif;color:#000;}
+.dice-death{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.subbox{border:1.5px solid #000;padding:4px 5px;}
+.dice-inputs{display:flex;gap:3px;align-items:center;margin-top:3px;flex-wrap:wrap;}
+.dice-in{font-size:14.2px;background:transparent;border:none;border-bottom:1px solid #000;outline:none;text-align:center;font-family:'Cuprum',sans-serif;color:#000;}
+.death-row{display:flex;align-items:center;gap:3px;margin:2px 0;width:100%;}
+.bubble-cb{width:14px;height:14px;border:1.5px solid #000;border-radius:50%;appearance:none;-webkit-appearance:none;cursor:pointer;background:#fff;flex-shrink:0;}
+.bubble-cb:checked{background:#000;}
+.atk-tbl{width:100%;border-collapse:collapse;border:1.5px solid #000;table-layout:fixed;}
+.atk-tbl th{font-size:7.1px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:1px solid #000;padding:2px 3px;background:#f0f0f0;}
+.atk-tbl td{border:1px solid #d0d0d0;padding:1px 3px;}
+.atk-in{background:transparent;border:none;outline:none;font-family:'Cuprum',sans-serif;font-size:13px;color:#000;width:100%;padding:1px 0;}
+.coins{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;margin:4px 0;}
+.coin-c{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}
+.coin-tag{font-size:8.3px;font-weight:700;border:1.5px solid #000;padding:1px 3px;background:#fff;letter-spacing:1px;white-space:nowrap;}
+.coin-in{font-size:14.2px;font-weight:700;background:transparent;border:none;border-bottom:1.5px solid #000;text-align:center;width:100%;outline:none;font-family:'Cuprum',sans-serif;color:#000;}
+
+/* ── BOTTOM ROW ── */
+.bottom3{display:grid;grid-template-columns:minmax(0,1fr) 203px;gap:5px;margin-top:28px;align-items:start;}
+.pers-col{display:flex;flex-direction:column;gap:8px;}
+.pers-box{border:1.5px solid #000;padding:4px 5px;}
+
+/* ── PAGE 2 ── */
+.bio-layout{display:grid;grid-template-columns:236px minmax(0,1fr);gap:8px;margin-top:6px;}
+.bio-left,.bio-right{display:flex;flex-direction:column;gap:14px;min-width:0;}
+.portrait-box{border:1.5px solid #000;width:100%;height:200px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-direction:column;gap:4px;color:#bbb;font-size:10.6px;font-style:italic;}
+.portrait-box img{width:100%;height:100%;object-fit:cover;}
+.ally-inner{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:6px;}
+.org-box{border:1.5px solid #000;padding:4px 5px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.org-symbol{border:1px solid #ccc;flex:1;min-height:60px;margin-top:3px;}
+
+/* ── PAGE 3 SPELLS ── */
+.spell-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
+.sp-box{border:1.5px solid #000;padding:4px 5px;min-width:0;}
+.sp-head{display:flex;align-items:center;gap:4px;border-bottom:2px solid #000;padding-bottom:3px;margin-bottom:3px;flex-wrap:wrap;}
+.sp-badge{font-size:16.5px;font-weight:700;border:2px solid #000;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Cuprum',sans-serif;color:#000;}
+.sp-slots{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.sp-slot-pair{display:flex;flex-direction:column;gap:1px;}
+.sp-slot-pair span{font-size:6.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.sp-slot-pair input{font-size:11.8px;font-weight:700;background:transparent;border:none;border-bottom:1px solid #000;outline:none;width:33px;font-family:'Cuprum',sans-serif;color:#000;}
+.sp-row{display:flex;align-items:center;gap:4px;border-bottom:1px solid #efefef;padding:1px 0;}
+.sp-row:last-child{border-bottom:none;}
+.sp-name{background:transparent;border:none;outline:none;font-family:'Cuprum',sans-serif;font-size:11.8px;color:#000;flex:1;min-width:0;}
+.sp-name:focus{border-bottom:1px solid #aaa;}
+
+/* ── PRINT ── */
+@media print{
+  body{background:#fff;}
+  .toolbar,.tabs{display:none!important;}
+  .pages{padding:0;}
+  .page{box-shadow:none;page-break-after:always;width:100%;transform:none!important;}
+  .tab-content{display:block!important;}
+}
+#race_info_bar{transition:opacity .2s;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+#auth_overlay{position:fixed;inset:0;z-index:9999;background:#111;display:flex;align-items:center;justify-content:center;padding:16px;}
+#auth_box{width:min(92vw,340px);background:#1b1b1b;border:1px solid #444;border-radius:3px;padding:26px 22px;display:flex;flex-direction:column;gap:10px;font-family:'Cuprum','Scada',Arial,sans-serif;}
+#auth_box .auth-title{color:#ddd;font-size:22px;letter-spacing:3px;text-align:center;text-transform:uppercase;}
+#auth_box .auth-sub{color:#888;font-size:12px;letter-spacing:2px;text-align:center;text-transform:uppercase;margin-bottom:8px;}
+#auth_box input{background:#111;color:#ddd;border:1px solid #444;border-radius:2px;padding:10px;font-size:16px;font-family:inherit;width:100%;}
+#auth_box .auth-btn{background:#222;color:#ccc;border:1px solid #444;border-radius:2px;padding:10px;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:inherit;cursor:pointer;}
+#auth_box .auth-btn:hover{background:#2e2e2e;}
+#auth_box .auth-btn:disabled{opacity:.5;cursor:default;}
+#auth_box .auth-primary{background:#6e1a1a;border-color:#a33;color:#fff;}
+#auth_box .auth-primary:hover{background:#852020;}
+#auth_box .auth-link{color:#8af;font-size:12px;text-align:center;text-decoration:underline;}
+#auth_msg{min-height:16px;font-size:12.5px;text-align:center;line-height:1.3;}
+@media print{#auth_overlay{display:none!important;}}
+</style>
+</head>
+<body>
+<div id="auth_overlay">
+  <div id="auth_box">
+    <div class="auth-title">⚔ D&amp;D 5e</div>
+    <div class="auth-sub">Ficha de Personagem</div>
+    <input data-f="email" type="email" placeholder="E-mail" autocomplete="email">
+    <input data-f="pass" type="password" placeholder="Senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="auth-btn auth-primary" onclick="doLogin()">Entrar</button>
+    <button class="auth-btn" onclick="doSignup()">Criar conta</button>
+    <a href="#" class="auth-link" onclick="doReset();return false;">Esqueci minha senha</a>
+    <div id="auth_msg"></div>
+  </div>
+</div>
+<div class="app-wrap">
+<div class="toolbar">
+  <span class="toolbar-title">⚔ D&D 5e — Ficha de Personagem</span>
+  <select id="char_selector" style="font-family:'Cuprum',sans-serif;font-size:11.8px;padding:0 8px;background:#222;color:#ccc;border:1px solid #444;border-radius:2px;cursor:pointer;width:140px;height:52px;align-self:center;flex-shrink:0;" onchange="switchCharacter(this.value)"></select>
+  <div class="toolbar-group">
+    <button class="tbtn tbtn-save" onclick="saveSheet()">💾 Salvar</button>
+    <button class="tbtn tbtn-print" onclick="window.print()">🖨 Imprimir</button>
+  </div>
+  <div class="toolbar-group">
+    <button class="tbtn" style="background:#1a1a3a;color:#8af;border-color:#468;" onclick="exportBackup()">⬇ Backup</button>
+    <label class="tbtn" style="background:#1a1a3a;color:#8af;border-color:#468;margin:0;">⬆ Restaurar<input type="file" accept=".json" onchange="importBackup(this.files[0])" style="display:none;"></label>
+  </div>
+  <div class="toolbar-group">
+    <button class="tbtn" style="background:#1a3a1a;color:#8f8;border-color:#4a6;" onclick="newCharacter()">+ Novo</button>
+    <button class="tbtn" style="background:#3a1a1a;color:#f88;border-color:#844;" onclick="deleteCharacter()">Apagar</button>
+  </div>
+  <div class="toolbar-group">
+    <span id="user_email" style="color:#888;font-size:10px;width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;"></span>
+    <button class="tbtn" style="background:#222;color:#ccc;" onclick="doLogout()">Sair</button>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('main',this)">⚔ Principal</button>
+  <button class="tab-btn" onclick="showTab('bio',this)">📜 Biografia</button>
+  <button class="tab-btn" onclick="showTab('spells',this)">✨ Magias</button>
+</div>
+
+
+<!-- ════════════════════════════════
+     PAGE 1  PRINCIPAL
+════════════════════════════════ -->
+<div id="tab-main" class="tab-content active">
+<div class="pages"><div class="page">
+<div class="page-border"></div>
+<div class="page-inner">
+
+  <!-- TOP BAND -->
+  <div class="dnd-band">
+    <div class="dnd-logo-block">
+      <div class="dnd-dragon">🐲</div>
+      <div class="dnd-text">DUNGEONS &amp; DRAGONS®<small>Ficha de Personagem</small></div>
+    </div>
+    <div class="header-fields-wrap">
+      <div class="hrow hrow-1">
+        <div class="uf-split">
+          <div class="uf" style="flex:1;">
+            <label>Classe</label>
+            <select id="classe_sel" onchange="onClasseChange()" style="font-family:'Cuprum',sans-serif;font-size:15.3px;border:none;border-bottom:1px solid #000;background:transparent;width:100%;outline:none;color:#000;">
+              <option value="">— Escolha —</option>
+              <option value="barbaro">Bárbaro</option>
+              <option value="bardo">Bardo</option>
+              <option value="bruxo">Bruxo</option>
+              <option value="clerigo">Clérigo</option>
+              <option value="druida">Druida</option>
+              <option value="feiticeiro">Feiticeiro</option>
+              <option value="guerreiro">Guerreiro</option>
+              <option value="ladino">Ladino</option>
+              <option value="mago">Mago</option>
+              <option value="monge">Monge</option>
+              <option value="paladino">Paladino</option>
+              <option value="patrulheiro">Patrulheiro</option>
+            </select>
+          </div>
+          <div class="uf" id="classe2_wrap" style="flex:1;">
+            <label id="classe2_lbl">🔒 Multiclasse (Nv. 2+)</label>
+            <select id="classe2_sel" onchange="onClasse2Change()" disabled title="Disponível a partir do nível 2 (PHB p.163)" style="font-family:'Cuprum',sans-serif;font-size:15.3px;border:none;border-bottom:1px solid #000;background:transparent;width:100%;outline:none;color:#000;">
+              <option value="">— Nenhuma —</option>
+              <option value="barbaro" title="Pré-requisito: Força 13 · Ganha: Escudos, armas simples, armas marciais">Bárbaro</option>
+              <option value="bardo" title="Pré-requisito: Carisma 13 · Ganha: Armadura leve, uma perícia à escolha, um instrumento musical à escolha">Bardo</option>
+              <option value="bruxo" title="Pré-requisito: Carisma 13 · Ganha: Armadura leve, armas simples">Bruxo</option>
+              <option value="clerigo" title="Pré-requisito: Sabedoria 13 · Ganha: Armadura leve, armadura média, escudos">Clérigo</option>
+              <option value="druida" title="Pré-requisito: Sabedoria 13 · Ganha: Armadura leve, armadura média, escudos (não metálicos)">Druida</option>
+              <option value="feiticeiro" title="Pré-requisito: Carisma 13 · Ganha: —">Feiticeiro</option>
+              <option value="guerreiro" title="Pré-requisito: Força 13 ou Destreza 13 · Ganha: Armadura leve, armadura média, escudos, armas simples, armas marciais">Guerreiro</option>
+              <option value="ladino" title="Pré-requisito: Destreza 13 · Ganha: Armadura leve, uma perícia da lista da classe, ferramentas de ladrão">Ladino</option>
+              <option value="mago" title="Pré-requisito: Inteligência 13 · Ganha: —">Mago</option>
+              <option value="monge" title="Pré-requisito: Destreza 13 e Sabedoria 13 · Ganha: Armas simples, espadas curtas">Monge</option>
+              <option value="paladino" title="Pré-requisito: Força 13 e Carisma 13 · Ganha: Armadura leve, armadura média, escudos, armas simples, armas marciais">Paladino</option>
+              <option value="patrulheiro" title="Pré-requisito: Destreza 13 e Sabedoria 13 · Ganha: Armadura leve, armadura média, escudos, armas simples, armas marciais, uma perícia da lista da classe">Patrulheiro</option>
+            </select>
+          </div>
+        </div>
+        <div class="uf">
+          <label>Nível</label>
+          <select id="nivel_sel" onchange="onNivelChange()" style="font-family:'Cuprum',sans-serif;font-size:15.3px;border:none;border-bottom:1px solid #000;background:transparent;width:100%;outline:none;color:#000;">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+            <option value="13">13</option><option value="14">14</option><option value="15">15</option>
+            <option value="16">16</option><option value="17">17</option><option value="18">18</option>
+            <option value="19">19</option><option value="20">20</option>
+          </select>
+        </div>
+        <div class="uf">
+          <label>Antecedente</label>
+          <select id="antecedente_sel" onchange="onAntecChange()" style="font-family:'Cuprum',sans-serif;font-size:15.3px;border:none;border-bottom:1px solid #000;background:transparent;width:100%;outline:none;color:#000;appearance:none;-webkit-appearance:none;">
+            <option value="">— Escolha —</option>
+            <option value="acolito">Acólito</option>
+            <option value="artesao_guilda">Artesão de Guilda</option>
+            <option value="charlatan">Charlatão</option>
+            <option value="criminoso">Criminoso</option>
+            <option value="entretenedor">Entretenedor</option>
+            <option value="heroi_povo">Herói do Povo</option>
+            <option value="marinheiro">Marinheiro</option>
+            <option value="nobre">Nobre</option>
+            <option value="fora_lei">Fora-da-Lei</option>
+            <option value="forasteiro">Forasteiro</option>
+            <option value="eremita">Eremita</option>
+            <option value="sabio">Sábio</option>
+            <option value="soldado">Soldado</option>
+            <option value="urchin">Órfão de Rua</option>
+          </select>
+        </div>
+        <div class="uf"><label>Nome do Jogador</label><input id="jogador" type="text"></div>
+      </div>
+      <div class="hrow hrow-2">
+        <div class="uf"><label>Nome do Personagem</label><input id="nome" type="text"></div>
+        <div class="uf">
+          <label>Raça</label>
+          <select id="raca_sel" onchange="onRacaChange()" style="font-family:'Cuprum',sans-serif;font-size:15.3px;border:none;border-bottom:1px solid #000;background:transparent;width:100%;outline:none;color:#000;">
+            <option value="">— Escolha —</option>
+            <option value="anao_colina">Anão da Colina</option>
+            <option value="anao_montanha">Anão da Montanha</option>
+            <option value="alto_elfo">Alto Elfo</option>
+            <option value="elfo_floresta">Elfo da Floresta</option>
+            <option value="drow">Drow (Elfo Negro)</option>
+            <option value="halfling_pesados">Halfling Pés-Pesados</option>
+            <option value="halfling_pesosleves">Halfling Pés-Leves</option>
+            <option value="humano">Humano</option>
+            <option value="draconato">Draconato</option>
+            <option value="gnomo_floresta">Gnomo da Floresta</option>
+            <option value="gnomo_rochas">Gnomo das Rochas</option>
+            <option value="meio_elfo">Meio-Elfo</option>
+            <option value="meio_orc">Meio-Orc</option>
+            <option value="tiefling">Tiefling</option>
+            <optgroup label="── Guia do Volo ──">
+            <option value="aasimar_protegido">Aasimar (Protegido)</option>
+            <option value="aasimar_caido">Aasimar (Caído)</option>
+            <option value="aasimar_flagelador">Aasimar (Açoitador)</option>
+            <option value="firbolg">Firbolg</option>
+            <option value="golias">Golias</option>
+            <option value="kenku">Kenku</option>
+            <option value="tabaxi">Tabaxi</option>
+            <option value="triton">Tritão</option>
+            <option value="lizardfolk">Homem-Lagarto</option>
+            <option value="bugbear">Bugbear</option>
+            <option value="goblin">Goblin</option>
+            <option value="hobgoblin">Hobgoblin</option>
+            <option value="kobold">Kobold</option>
+            <option value="orc_volo">Orc (Volo)</option>
+            <option value="yuan_ti_puro">Yuan-ti Puro-Sangue</option>
+            </optgroup>
+            <optgroup label="── Mordenkainen: Monstros do Multiverso ──">
+            <option value="aarakocra">Aarakocra</option>
+            <option value="aasimar_mm">Aasimar (MM)</option>
+            <option value="bugurso">Bugurso</option>
+            <option value="centauro">Centauro</option>
+            <option value="duergar">Duergar</option>
+            <option value="duplicante">Duplicante</option>
+            <option value="eladrin">Eladrin</option>
+            <option value="elfo_marinho">Elfo Marinho</option>
+            <option value="fada">Fada</option>
+            <option value="firbolg_mm">Firbolg (MM)</option>
+            <option value="genasi_agua">Genasi da Água</option>
+            <option value="genasi_ar">Genasi do Ar</option>
+            <option value="genasi_fogo">Genasi do Fogo</option>
+            <option value="genasi_terra">Genasi da Terra</option>
+            <option value="githyanki">Githyanki</option>
+            <option value="githzerai">Githzerai</option>
+            <option value="gnomo_profundezas">Gnomo das Profundezas</option>
+            <option value="goblin_mm">Goblin (MM)</option>
+            <option value="golias_mm">Golias (MM)</option>
+            <option value="hobgoblin_mm">Hobgoblin (MM)</option>
+            <option value="kenku_mm">Kenku (MM)</option>
+            <option value="kobold_mm">Kobold (MM)</option>
+            <option value="laparlonj">Laparlonj</option>
+            <option value="minotauro">Minotauro</option>
+            <option value="morfo">Morfo</option>
+            <option value="orc_mm">Orc (MM)</option>
+            <option value="reptante">Reptante</option>
+            <option value="satiro">Sátiro</option>
+            <option value="shadar_kai">Shadar-kai</option>
+            <option value="tabaxi_mm">Tabaxi (MM)</option>
+            <option value="tortuga">Tortuga</option>
+            <option value="triton_mm">Tritão (MM)</option>
+            <option value="yuan_ti_mm">Yuan-ti (MM)</option>
+            </optgroup>
+            <optgroup label="── Guia de Van Richten para Ravenloft ──">
+            <option value="dampir">Dampir</option>
+            <option value="renascido">Renascido</option>
+            <option value="sangue_bruxa">Sangue de Bruxa</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="uf"><label>Tendência</label><input id="tendencia" type="text"></div>
+        <div class="uf"><label>Pontos de Experiência</label><input id="xp" type="number" oninput="onXPChange()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN 3 COLUMNS -->
+  <div class="main3">
+
+    <!-- LEFT: ATTRS -->
+    <div class="attr-col">
+      <div class="insp-row" style="flex-direction:column;gap:3px;align-items:center;padding:4px 4px;">
+        <input type="checkbox" class="insp-cb" id="inspiracao">
+        <span class="slabel" style="font-size:7.1px;text-align:center;margin-bottom:0;">Inspiração</span>
+      </div>
+      <div class="prof-box">
+        <input class="prof-val" id="prof_bonus" type="text" placeholder="+2">
+        <span class="slabel" style="font-size:7.1px;margin-top:4px;margin-bottom:0;text-align:center;">Bônus de Proficiência</span>
+      </div>
+      <div id="attrs_col"></div>
+    </div>
+
+    <!-- MID: SAVES / SKILLS -->
+    <div class="mid-col">
+
+      <div class="listbox">
+        <span class="slabel">Testes de Resistência</span>
+        <div style="font-size:7.1px;color:#888;margin-bottom:3px;font-style:italic;">✎ editável · duplo clique restaura cálculo</div>
+        <div id="saves_list"></div>
+      </div>
+
+      <div class="listbox">
+        <span class="slabel">Perícias</span>
+        <div id="skills_list"></div>
+      </div>
+
+      <div class="passive-box">
+        <div class="passive-num-box"><input class="passive-in" id="passive_wis" type="number" placeholder="10"></div>
+        <div>
+          <div style="font-size:8.8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Sabedoria Passiva</div>
+          <div style="font-size:8.3px;color:#666;">(Percepção)</div>
+        </div>
+      </div>
+
+      <div class="lined-box" style="flex:1;display:flex;flex-direction:column;margin-top:auto;">
+        <span class="slabel">Idiomas e Outras Proficiências</span>
+        <textarea class="big-ta lined-bg" id="idiomas" rows="18" style="flex:1;"></textarea>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: COMBAT -->
+    <div class="right-col">
+
+      <div class="combat3">
+        <div class="combat-cell">
+          <input class="combat-in" id="ca" type="number" placeholder="10">
+          <span class="slabel" style="font-size:7.1px;text-align:center;margin-top:4px;margin-bottom:0;">C. de Armadura</span>
+        </div>
+        <div class="combat-cell">
+          <input class="combat-in" id="iniciativa" type="text" placeholder="+0">
+          <span class="slabel" style="font-size:7.1px;text-align:center;margin-top:4px;margin-bottom:0;">Iniciativa</span>
+        </div>
+        <div class="combat-cell">
+          <input class="combat-in" id="desloc" type="text" placeholder="9m">
+          <span class="slabel" style="font-size:7.1px;text-align:center;margin-top:4px;margin-bottom:0;">Desloc.</span>
+        </div>
+      </div>
+
+      <div class="hp-block">
+        <div class="hp-max-row">
+          <span class="slabel" style="margin-bottom:0;">PV Máximos</span>
+          <input class="hp-max-in" id="pv_max" type="number" placeholder="0" oninput="this.dataset.manual='1'">
+        </div>
+        <span class="slabel">Pontos de Vida Atuais</span>
+        <input class="hp-big" id="pv_atual" type="number">
+        <span class="slabel" style="margin-top:6px;">Pontos de Vida Temporários</span>
+        <input class="hp-med" id="pv_temp" type="number">
+      </div>
+
+      <div class="dice-death">
+        <div class="subbox">
+          <span class="slabel">Dados de Vida</span>
+          <div class="dice-inputs">
+            <input class="dice-in" id="dados_total" type="text" placeholder="Total" style="width:32px;">
+            <input class="dice-in" id="dados_tipo" type="text" placeholder="d8" style="width:22px;">
+          </div>
+        </div>
+        <div class="subbox">
+          <span class="slabel">Testes c/ Morte</span>
+          <div class="death-row">
+            <span style="font-size:8.8px;font-weight:700;flex:1;">Sucessos</span>
+            <input type="checkbox" class="bubble-cb" id="ds1">
+            <input type="checkbox" class="bubble-cb" id="ds2">
+            <input type="checkbox" class="bubble-cb" id="ds3">
+          </div>
+          <div class="death-row">
+            <span style="font-size:8.8px;font-weight:700;flex:1;">Fracassos</span>
+            <input type="checkbox" class="bubble-cb" id="df1">
+            <input type="checkbox" class="bubble-cb" id="df2">
+            <input type="checkbox" class="bubble-cb" id="df3">
+          </div>
+        </div>
+      </div>
+
+      <div class="lined-box" style="overflow:hidden;">
+        <span class="slabel">Ataques e Magias</span>
+        <table class="atk-tbl">
+          <thead>
+            <tr>
+              <th style="width:44%">Nome</th>
+              <th style="width:18%">Bônus</th>
+              <th>Dano / Tipo</th>
+            </tr>
+          </thead>
+          <tbody id="atk_body"></tbody>
+        </table>
+        <textarea class="big-ta" id="atk_notes" rows="4" style="margin-top:3px;border:1px solid #ccc;padding:3px;" placeholder="Notas sobre ataques e magias…"></textarea>
+      </div>
+
+      <div class="lined-box">
+        <span class="slabel">Moedas</span>
+        <div class="coins">
+          <div class="coin-c"><span class="coin-tag">PC</span><input class="coin-in" id="pc" type="number" placeholder="0"></div>
+          <div class="coin-c"><span class="coin-tag">PL</span><input class="coin-in" id="pl" type="number" placeholder="0"></div>
+          <div class="coin-c"><span class="coin-tag">PE</span><input class="coin-in" id="pe" type="number" placeholder="0"></div>
+          <div class="coin-c"><span class="coin-tag">PO</span><input class="coin-in" id="po" type="number" placeholder="0"></div>
+          <div class="coin-c"><span class="coin-tag">PP</span><input class="coin-in" id="pp" type="number" placeholder="0"></div>
+        </div>
+      </div>
+
+      <div class="lined-box" style="flex:1;margin-top:auto;">
+        <span class="slabel">Equipamento</span>
+        <textarea class="big-ta lined-bg" id="equipamento" rows="20"></textarea>
+      </div>
+
+    </div>
+  </div><!-- /main3 -->
+
+  <!-- BOTTOM 3 COLS -->
+  <div class="bottom3">
+    <div class="pers-col">
+      <div class="pers-box">
+        <span class="slabel">Traços de Personalidade</span>
+        <textarea class="big-ta" id="tracos" rows="3"></textarea>
+      </div>
+      <div class="pers-box">
+        <span class="slabel">Ideais</span>
+        <textarea class="big-ta" id="ideais" rows="2"></textarea>
+      </div>
+      <div class="pers-box">
+        <span class="slabel">Ligações</span>
+        <textarea class="big-ta" id="ligacoes" rows="2"></textarea>
+      </div>
+      <div class="pers-box">
+        <span class="slabel">Defeitos</span>
+        <textarea class="big-ta" id="defeitos" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="lined-box">
+      <span class="slabel">Características e Habilidades</span>
+      <textarea class="big-ta lined-bg" id="habilidades" rows="20"></textarea>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:7.1px;color:#999;margin-top:6px;border-top:1px solid #e0e0e0;padding-top:4px;">
+    TM &amp; © 2014 Wizards of the Coast LLC. Cópia permitida apenas para uso pessoal.
+  </div>
+
+</div></div></div>
+</div>
+
+
+<!-- ════════════════════════════════
+     PAGE 2  BIOGRAFIA
+════════════════════════════════ -->
+<div id="tab-bio" class="tab-content">
+<div class="pages"><div class="page">
+<div class="page-border"></div>
+<div class="page-inner">
+
+  <div class="dnd-band">
+    <div class="dnd-logo-block">
+      <div class="dnd-dragon">🐲</div>
+      <div class="dnd-text">D&amp;D®<small>Biografia do Personagem</small></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0 8px;align-items:end;">
+        <div class="uf"><label>Nome do Personagem</label><input id="bio_nome" type="text"></div>
+        <div class="uf"><label>Idade</label><input id="bio_idade" type="text"></div>
+        <div class="uf"><label>Altura</label><input id="bio_altura" type="text"></div>
+        <div class="uf"><label>Peso</label><input id="bio_peso" type="text"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 8px;align-items:end;">
+        <div class="uf"><label>Olhos</label><input id="bio_olhos" type="text"></div>
+        <div class="uf"><label>Pele</label><input id="bio_pele" type="text"></div>
+        <div class="uf"><label>Cabelos</label><input id="bio_cabelos" type="text"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bio-layout">
+    <div class="bio-left">
+      <div class="portrait-box" id="portrait_box" title="Clique para adicionar imagem">
+        <span>📷 Aparência do Personagem</span>
+        <span style="font-size:9.4px;">(clique para adicionar)</span>
+      </div>
+      <input type="file" id="portrait_input" accept="image/*" style="display:none">
+      <div class="lined-box" style="flex:1;">
+        <span class="slabel">História do Personagem</span>
+        <textarea class="big-ta lined-bg" id="historia" rows="34"></textarea>
+      </div>
+    </div>
+    <div class="bio-right">
+      <div class="listbox" style="flex:1;">
+        <span class="slabel">Aliados e Organizações</span>
+        <div class="ally-inner">
+          <textarea class="big-ta" id="aliados" rows="10" style="border:1px solid #ddd;padding:3px;"></textarea>
+          <div class="org-box">
+            <span class="slabel" style="font-size:7.1px;">Nome da Organização</span>
+            <input style="border:none;border-bottom:1px solid #000;font-size:11.8px;outline:none;font-family:'Cuprum',sans-serif;padding:1px 2px;" id="org_nome" type="text">
+            <div class="org-symbol"></div>
+            <span class="slabel" style="margin-top:4px;margin-bottom:0;">Símbolo</span>
+          </div>
+        </div>
+      </div>
+      <div class="lined-box" style="flex:1;">
+        <span class="slabel">Outras Características e Habilidades</span>
+        <textarea class="big-ta lined-bg" id="outras_hab" rows="11"></textarea>
+      </div>
+      <div class="lined-box" style="flex:1;">
+        <span class="slabel">Tesouro</span>
+        <textarea class="big-ta lined-bg" id="tesouro" rows="8"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:7.1px;color:#999;margin-top:6px;border-top:1px solid #e0e0e0;padding-top:4px;">
+    TM &amp; © 2014 Wizards of the Coast LLC. Cópia permitida apenas para uso pessoal.
+  </div>
+
+</div></div></div>
+</div>
+
+
+<!-- ════════════════════════════════
+     PAGE 3  MAGIAS
+════════════════════════════════ -->
+<div id="tab-spells" class="tab-content">
+<div class="pages"><div class="page">
+<div class="page-border"></div>
+<div class="page-inner">
+
+  <div class="dnd-band">
+    <div class="dnd-logo-block">
+      <div class="dnd-dragon">✨</div>
+      <div class="dnd-text">D&amp;D®<small>Folha de Magias</small></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0 10px;flex:1;align-items:end;">
+      <div class="uf"><label>Classe de Conjurador</label><input id="sp_classe" type="text"></div>
+      <div class="uf"><label>Atributo de Conjuração</label><input id="sp_hab" type="text"></div>
+      <div class="uf"><label>CD de Magia</label><input id="sp_cd" type="number"></div>
+      <div class="uf"><label>Bônus de Ataque</label><input id="sp_atk" type="text" placeholder="+0"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:16px;margin-bottom:8px;align-items:center;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:8.3px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Magias Conhecidas / Preparadas</span>
+      <input id="sp_conhecidas" type="number" style="width:38px;border:none;border-bottom:1px solid #000;font-size:13px;outline:none;font-family:'Cuprum',sans-serif;">
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:8.3px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Pontos de Magia (PM)</span>
+      <input id="sp_pm" type="number" style="width:38px;border:none;border-bottom:1px solid #000;font-size:13px;outline:none;font-family:'Cuprum',sans-serif;">
+    </div>
+  </div>
+
+  <div class="spell-cols" id="spells_grid"></div>
+
+  <div class="lined-box" style="margin-top:8px;">
+    <span class="slabel">Observações</span>
+    <textarea class="big-ta lined-bg" id="sp_obs" rows="14"></textarea>
+  </div>
+
+  <div style="text-align:center;font-size:7.1px;color:#999;margin-top:6px;border-top:1px solid #e0e0e0;padding-top:4px;">
+    TM &amp; © 2014 Wizards of the Coast LLC. Cópia permitida apenas para uso pessoal.
+  </div>
+
+</div></div></div>
+</div>
+</div>
+
+<script>
+/* ───────── DATA ───────── */
+const ATTRS=[
+  {id:'for',name:'Força'},
+  {id:'des',name:'Destreza'},
+  {id:'con',name:'Constituição'},
+  {id:'int',name:'Inteligência'},
+  {id:'sab',name:'Sabedoria'},
+  {id:'car',name:'Carisma'},
+];
+const SKILLS=[
+  {id:'acrobacia',name:'Acrobacia',a:'Des'},
+  {id:'arcanismo',name:'Arcanismo',a:'Int'},
+  {id:'atletismo',name:'Atletismo',a:'For'},
+  {id:'atuacao',name:'Atuação',a:'Car'},
+  {id:'blefar',name:'Enganação',a:'Car'},
+  {id:'furtividade',name:'Furtividade',a:'Des'},
+  {id:'historia_sk',name:'História',a:'Int'},
+  {id:'intimidacao',name:'Intimidação',a:'Car'},
+  {id:'intuicao',name:'Intuição',a:'Sab'},
+  {id:'investigacao',name:'Investigação',a:'Int'},
+  {id:'animais',name:'Adestrar Animais',a:'Sab'},
+  {id:'medicina',name:'Medicina',a:'Sab'},
+  {id:'natureza',name:'Natureza',a:'Int'},
+  {id:'percepcao',name:'Percepção',a:'Sab'},
+  {id:'persuasao',name:'Persuasão',a:'Car'},
+  {id:'prestidigitacao',name:'Prestidigitação',a:'Des'},
+  {id:'religiao',name:'Religião',a:'Int'},
+  {id:'sobrevivencia',name:'Sobrevivência',a:'Sab'},
+];
+const SPELL_LEVELS=[
+  {n:0,label:'Truques',slots:false,rows:8},
+  {n:1,slots:true,rows:12},{n:2,slots:true,rows:12},
+  {n:3,slots:true,rows:12},{n:4,slots:true,rows:12},
+  {n:5,slots:true,rows:8},{n:6,slots:true,rows:8},
+  {n:7,slots:true,rows:8},{n:8,slots:true,rows:6},
+  {n:9,slots:true,rows:6},
+];
+
+/* ───────── ATTR → MOD MAP ───────── */
+const ATTR_ID_MAP={For:'for',Des:'des',Con:'con',Int:'int',Sab:'sab',Car:'car'};
+
+function getMod(attrShortOrId){
+  /* accepts short label like 'Des' or full id like 'des' */
+  const id=ATTR_ID_MAP[attrShortOrId]||attrShortOrId;
+  const v=parseInt((document.getElementById(id+'_val')||{}).value)||10;
+  return Math.floor((v-10)/2);
+}
+
+function getProfBonus(){
+  const raw=document.getElementById('prof_bonus').value.replace('+','').trim();
+  return parseInt(raw)||0;
+}
+
+function fmtBonus(n){return (n>=0?'+':'')+n;}
+
+function calcMod(id){
+  const v=parseInt(document.getElementById(id+'_val').value)||10;
+  const m=Math.floor((v-10)/2);
+  document.getElementById(id+'_mod').textContent=fmtBonus(m);
+  recalcAll();
+  if(id==='con'){
+    const cls=document.getElementById('classe_sel').value;
+    const niv=parseInt(document.getElementById('nivel_sel').value)||1;
+    if(cls) applyClassData(cls,niv);
+  }
+}
+
+function recalcAll(){
+  /* Skills — empty if unchecked, mod+prof if checked */
+  SKILLS.forEach(sk=>{
+    const cb=document.getElementById('sk_'+sk.id);
+    const input=document.getElementById('sk_'+sk.id+'_b');
+    if(!cb||!input)return;
+    if(cb.checked){
+      input.value=fmtBonus(getMod(sk.a)+getProfBonus());
+    } else {
+      input.value='';
+    }
+  });
+  /* Saving throws — auto if not manually overridden */
+  ATTRS.forEach(a=>{
+    const cb=document.getElementById('sv_'+a.id);
+    const input=document.getElementById('sv_'+a.id+'_b');
+    if(!cb||!input)return;
+    /* skip if user has manually edited this field */
+    if(input.dataset.manual==='1') return;
+    if(cb.checked){
+      input.value=fmtBonus(getMod(a.id)+getProfBonus());
+      input.classList.add('auto-calc');
+      input.classList.remove('user-edit');
+    } else {
+      input.value='';
+      input.classList.remove('auto-calc','user-edit');
+    }
+  });
+  /* Passive Wisdom = 10 + Perception bonus (or just 10 if unchecked) */
+  const percCb=document.getElementById('sk_percepcao');
+  const percEl=document.getElementById('sk_percepcao_b');
+  if(percEl) document.getElementById('passive_wis').value=10+(parseInt(percEl.value)||0);
+}
+
+/* ───────── BUILD ATTRS ───────── */
+function buildAttrs(){
+  const c=document.getElementById('attrs_col');
+  c.style.cssText='display:flex;flex-direction:column;gap:4px;';
+  ATTRS.forEach(a=>{
+    const d=document.createElement('div');
+    d.className='attr-block';
+    d.innerHTML=`
+      <span class="attr-name-lbl">${a.name}</span>
+      <div class="attr-score-box">
+        <input class="attr-score" id="${a.id}_val" type="number" min="1" max="30" placeholder="10" oninput="onAttrInput('${a.id}')">
+      </div>
+      <div class="attr-mod-circle" id="${a.id}_mod">+0</div>
+      <span class="attr-mod-lbl">Modificador</span>`;
+    c.appendChild(d);
+  });
+}
+
+/* ───────── BUILD SAVES ───────── */
+function buildSaves(){
+  const c=document.getElementById('saves_list');
+  ATTRS.forEach(a=>{
+    const r=document.createElement('div');r.className='list-row';
+    r.innerHTML=`<input type="checkbox" class="circle-cb" id="sv_${a.id}">
+      <input class="list-bonus" id="sv_${a.id}_b" type="text" placeholder="+0">
+      <span class="list-name">${a.name}</span>`;
+    c.appendChild(r);
+    const cb  = c.querySelector(`#sv_${a.id}`);
+    const inp = c.querySelector(`#sv_${a.id}_b`);
+    /* recalc when checkbox toggled — resets manual override */
+    cb.addEventListener('change', ()=>{
+      inp.dataset.manual='0';
+      inp.classList.remove('user-edit');
+      recalcAll();
+    });
+    /* mark as manually edited when user types */
+    inp.addEventListener('input', ()=>{
+      inp.dataset.manual='1';
+      inp.classList.add('user-edit');
+      inp.classList.remove('auto-calc');
+    });
+    /* double-click resets to auto-calc */
+    inp.addEventListener('dblclick', ()=>{
+      inp.dataset.manual='0';
+      inp.classList.remove('user-edit');
+      recalcAll();
+    });
+  });
+}
+
+/* ───────── BUILD SKILLS ───────── */
+function buildSkills(){
+  const c=document.getElementById('skills_list');
+  SKILLS.forEach(sk=>{
+    const r=document.createElement('div');r.className='list-row';
+    r.innerHTML=`<input type="checkbox" class="circle-cb" id="sk_${sk.id}">
+      <input class="list-bonus" id="sk_${sk.id}_b" type="text" placeholder="+0" readonly style="cursor:default;">
+      <span class="list-name">${sk.name}</span>
+      <span class="list-attr">(${sk.a})</span>`;
+    c.appendChild(r);
+    /* recalc when proficiency checkbox toggled */
+    c.querySelector(`#sk_${sk.id}`).addEventListener('change', recalcAll);
+  });
+}
+
+/* ───────── BUILD ATTACKS ───────── */
+function buildAtks(){
+  const tb=document.getElementById('atk_body');
+  for(let i=1;i<=4;i++){
+    tb.innerHTML+=`<tr>
+      <td><input class="atk-in" id="atk${i}_n" type="text"></td>
+      <td><input class="atk-in" id="atk${i}_b" type="text" style="text-align:center;"></td>
+      <td><input class="atk-in" id="atk${i}_d" type="text"></td>
+    </tr>`;
+  }
+}
+
+/* ───────── BUILD SPELLS ───────── */
+function buildSpells(){
+  const g=document.getElementById('spells_grid');
+  SPELL_LEVELS.forEach(lvl=>{
+    const box=document.createElement('div');
+    box.className='sp-box';
+    let slots='';
+    if(lvl.slots){
+      slots=`<div class="sp-slots">
+        <div class="sp-slot-pair"><span>Total</span><input id="sp${lvl.n}_tot" type="number" placeholder="0"></div>
+        <div class="sp-slot-pair"><span>Usados</span><input id="sp${lvl.n}_use" type="number" placeholder="0"></div>
+      </div>`;
+    }
+    let rows='';
+    for(let i=0;i<lvl.rows;i++){
+      rows+=`<div class="sp-row">
+        <input type="checkbox" class="circle-cb" id="sp${lvl.n}_${i}_p">
+        <input class="sp-name" id="sp${lvl.n}_${i}_n" type="text">
+      </div>`;
+    }
+    box.innerHTML=`<div class="sp-head">
+      <div class="sp-badge">${lvl.n}</div>
+      ${lvl.label?`<span style="font-size:9.4px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">${lvl.label}</span>`:''}
+      ${slots}
+    </div>${rows}`;
+    g.appendChild(box);
+  });
+}
+
+/* ───────── TABS ───────── */
+function showTab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  scalePages();
+}
+
+/* ───────── PORTRAIT ───────── */
+document.addEventListener('click', function(e) {
+  const pb = document.getElementById('portrait_box');
+  if (!pb) return;
+  if (pb.contains(e.target) && !e.target.matches('input[type=file]')) {
+    const pi = document.getElementById('portrait_input');
+    if (pi) pi.click();
+  }
+});
+document.addEventListener('change', function(e) {
+  if (!e.target.matches('#portrait_input')) return;
+  if (!e.target.files[0]) return;
+  const reader = new FileReader();
+  const pb = document.getElementById('portrait_box');
+  reader.onload = function(ev) {
+    if (pb) pb.innerHTML = '<img src="' + ev.target.result + '" alt="Retrato">';
+  };
+  reader.readAsDataURL(e.target.files[0]);
+});
+
+/* ───────── MULTI-CHARACTER SYSTEM ───────── */
+const CHARS_INDEX_KEY = 'dnd5e_chars_index';
+const CHAR_PREFIX     = 'dnd5e_char_';
+const LAST_CURRENT_KEY = 'dnd5e_last_current';
+let currentCharId = null;
+
+function getIndex() {
+  try { return JSON.parse(localStorage.getItem(CHARS_INDEX_KEY)) || []; }
+  catch(e) { return []; }
+}
+function setIndex(idx) { localStorage.setItem(CHARS_INDEX_KEY, JSON.stringify(idx)); }
+function genId() { return 'c' + Date.now() + Math.floor(Math.random()*9999); }
+/* Lembra qual personagem estava ativo, para restaurar ao recarregar a página */
+function setCurrentCharId(id) {
+  currentCharId = id;
+  if (id) localStorage.setItem(LAST_CURRENT_KEY, id);
+}
+
+function renderSelector() {
+  const sel = document.getElementById('char_selector');
+  const idx = getIndex();
+  sel.innerHTML = '';
+  idx.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name || '(sem nome)';
+    if (c.id === currentCharId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function getCurrentDisplayName() {
+  const nome = (document.getElementById('nome') || {}).value || '';
+  return nome.trim() || '(sem nome)';
+}
+
+function newCharacter() {
+  if (currentCharId) saveSheet(true);
+  const id = genId();
+  const idx = getIndex();
+  idx.push({ id, name: 'Novo Personagem' });
+  setIndex(idx);
+  setCurrentCharId(id);
+  clearSheet();
+  renderSelector();
+}
+
+function switchCharacter(id) {
+  if (id === currentCharId) return;
+  if (currentCharId) saveSheet(true);
+  setCurrentCharId(id);
+  loadSheet();
+  refreshAfterLoad();
+  renderSelector();
+}
+
+function deleteCharacter() {
+  const idx = getIndex();
+  if (idx.length <= 1) {
+    alert('Você precisa ter pelo menos um personagem. Crie outro antes de apagar este.');
+    return;
+  }
+  const name = getCurrentDisplayName();
+  if (!confirm('Apagar o personagem "' + name + '" permanentemente?')) return;
+  localStorage.removeItem(CHAR_PREFIX + currentCharId);
+  const newIdx = idx.filter(c => c.id !== currentCharId);
+  setIndex(newIdx);
+  setCurrentCharId(newIdx[0].id);
+  loadSheet();
+  refreshAfterLoad();
+  renderSelector();
+}
+
+function clearSheet() {
+  BASE_ATTRS = {for:10,des:10,con:10,int:10,sab:10,car:10};
+  document.querySelectorAll('input:not([type=checkbox]):not([type=file]),textarea').forEach(el => { if(el.id) el.value = ''; });
+  document.querySelectorAll('input[type=checkbox]').forEach(el => { if(el.id) el.checked = false; });
+  document.querySelectorAll('select').forEach(el => { if(el.id) el.selectedIndex = 0; });
+  const pvMaxEl=document.getElementById('pv_max');
+  if(pvMaxEl) delete pvMaxEl.dataset.manual;
+  const pb = document.getElementById('portrait_box');
+  if (pb) pb.innerHTML = '<span>📷 Aparência do Personagem</span><span style="font-size:9.4px;">(clique para adicionar)</span>';
+  refreshAfterLoad();
+}
+
+function initCharacters() {
+  let idx = getIndex();
+  const forcedId = localStorage.getItem('dnd5e_force_current');
+  if (forcedId) localStorage.removeItem('dnd5e_force_current');
+  const lastId = localStorage.getItem(LAST_CURRENT_KEY);
+  if (idx.length === 0) {
+    const legacy = localStorage.getItem('dnd5e_v4') || localStorage.getItem('dnd5e_v3');
+    if (legacy) {
+      let legacyName = 'Personagem';
+      try { const ld = JSON.parse(legacy); legacyName = ld['nome'] || legacyName; } catch(e) {}
+      const id = genId();
+      idx = [{ id, name: legacyName }];
+      setIndex(idx);
+      localStorage.setItem(CHAR_PREFIX + id, legacy);
+      setCurrentCharId(id);
+    } else {
+      const id = genId();
+      idx = [{ id, name: 'Novo Personagem' }];
+      setIndex(idx);
+      setCurrentCharId(id);
+    }
+  } else if (forcedId && idx.some(c => c.id === forcedId)) {
+    /* prioridade 1: personagem recém-restaurado de um backup */
+    setCurrentCharId(forcedId);
+  } else if (lastId && idx.some(c => c.id === lastId)) {
+    /* prioridade 2: último personagem que estava ativo antes de recarregar */
+    setCurrentCharId(lastId);
+  } else {
+    setCurrentCharId(idx[0].id);
+  }
+  renderSelector();
+}
+
+/* ───────── SAVE / LOAD ───────── */
+/* ─── BACKUP: exporta todos os personagens para um arquivo .json ─── */
+function exportBackup(){
+  if(currentCharId) saveSheet(true);
+  const idx=getIndex();
+  const entry=idx.find(c=>c.id===currentCharId);
+  if(!entry){ alert('Nenhum personagem ativo para exportar.'); return; }
+  const data={_index:[entry]};
+  data[CHAR_PREFIX+entry.id]=localStorage.getItem(CHAR_PREFIX+entry.id);
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const safeName=(entry.name||'personagem').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'personagem';
+  a.download='dnd5e-backup-'+safeName+'-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ─── RESTAURAR: importa personagens de um arquivo .json de backup ─── */
+function importBackup(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data._index) throw new Error('Formato inválido');
+      const existingIdx=getIndex();
+      const existingIds=new Set(existingIdx.map(c=>c.id));
+      let firstImportedId=null;
+      data._index.forEach(c=>{
+        const raw=data[CHAR_PREFIX+c.id];
+        if(!raw)return;
+        /* sempre gera id novo: evita conflito com personagens de outros usuários na nuvem */
+        const finalId=genId();
+        localStorage.setItem(CHAR_PREFIX+finalId, raw);
+        existingIdx.push({id:finalId, name: existingIds.has(c.id) ? c.name+' (importado)' : c.name});
+        addPend(finalId);
+        if(!firstImportedId) firstImportedId=finalId;
+      });
+      if(!firstImportedId) throw new Error('Nenhum personagem encontrado no backup');
+      setIndex(existingIdx);
+      /* garante que, após recarregar, o personagem importado seja o exibido */
+      localStorage.setItem('dnd5e_force_current', firstImportedId);
+      alert('Backup restaurado! A página será recarregada.');
+      location.reload();
+    }catch(err){
+      alert('Não foi possível ler o arquivo de backup: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function saveSheet(silent) {
+  const d={};
+  document.querySelectorAll('input:not([type=checkbox]):not([type=file]),textarea').forEach(el=>{if(el.id)d[el.id]=el.value;});
+  document.querySelectorAll('input[type=checkbox]').forEach(el=>{if(el.id)d[el.id]=el.checked;});
+  document.querySelectorAll('select').forEach(el=>{if(el.id)d[el.id]=el.value;});
+  d['_base_attrs']=JSON.stringify(BASE_ATTRS);
+  /* save portrait */
+  const pb = document.getElementById('portrait_box');
+  const img = pb ? pb.querySelector('img') : null;
+  d['_portrait'] = img ? img.src : '';
+  /* save manual override flags for saves */
+  const manuals={};
+  ATTRS.forEach(a=>{
+    const el=document.getElementById('sv_'+a.id+'_b');
+    if(el) manuals[a.id]=el.dataset.manual||'0';
+  });
+  d['_sv_manuals']=JSON.stringify(manuals);
+  /* save manual override flag for PV Máximo */
+  const pvMaxEl=document.getElementById('pv_max');
+  d['_pv_manual']=pvMaxEl?(pvMaxEl.dataset.manual||'0'):'0';
+  localStorage.setItem(CHAR_PREFIX + currentCharId, JSON.stringify(d));
+  /* Update name in index */
+  const idx = getIndex();
+  const entry = idx.find(c => c.id === currentCharId);
+  if (entry) { entry.name = getCurrentDisplayName(); setIndex(idx); }
+  renderSelector();
+  if (!silent) {
+    const b=document.querySelector('.tbtn-save');
+    b.textContent='✓ Salvo!';setTimeout(()=>b.textContent='💾 Salvar',1800);
+  }
+}
+
+function loadSheet(){
+  const raw = localStorage.getItem(CHAR_PREFIX + currentCharId)
+    || (getIndex()[0]?.id === currentCharId ? localStorage.getItem('dnd5e_v4') || localStorage.getItem('dnd5e_v3') : null);
+  if(!raw)return;
+  const d=JSON.parse(raw);
+  if(d['_base_attrs']){try{Object.assign(BASE_ATTRS,JSON.parse(d['_base_attrs']));}catch(e){}}
+  Object.entries(d).forEach(([id,val])=>{
+    if(id.startsWith('_'))return;
+    const el=document.getElementById(id);if(!el)return;
+    if(el.type==='checkbox')el.checked=val;
+    else el.value=val;
+  });
+  /* Restore portrait */
+  if (d['_portrait']) {
+    const pb = document.getElementById('portrait_box');
+    if (pb) pb.innerHTML = '<img src="' + d['_portrait'] + '" alt="Retrato">';
+  }
+  /* restore manual override flag for PV Máximo */
+  const pvMaxEl=document.getElementById('pv_max');
+  if(pvMaxEl) pvMaxEl.dataset.manual = d['_pv_manual']==='1' ? '1' : '0';
+  /* restore manual override flags */
+  if(d['_sv_manuals']){
+    try{
+      const manuals=JSON.parse(d['_sv_manuals']);
+      ATTRS.forEach(a=>{
+        const el=document.getElementById('sv_'+a.id+'_b');
+        if(el&&manuals[a.id]){
+          el.dataset.manual=manuals[a.id];
+          if(manuals[a.id]==='1'){
+            el.classList.add('user-edit');
+            el.classList.remove('auto-calc');
+          }
+        }
+      });
+    }catch(e){}
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DADOS DO LIVRO DO JOGADOR — RAÇAS E CLASSES
+═══════════════════════════════════════════ */
+
+/* Bônus de proficiência por nível (tabela oficial) */
+const PROF_BY_LEVEL=[0,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6];
+
+/* XP necessário por nível */
+const XP_BY_LEVEL=[0,0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000];
+
+/* Dados de vida e PV base por classe */
+const CLASSES_DATA={
+  barbaro:   {nome:'Bárbaro',    dado:'d12', pvBase:12, saves:['for','con'],  pericias:2, deslocamento:'9m'},
+  bardo:     {nome:'Bardo',      dado:'d8',  pvBase:8,  saves:['des','car'],  pericias:3, deslocamento:'9m'},
+  bruxo:     {nome:'Bruxo',      dado:'d8',  pvBase:8,  saves:['sab','car'],  pericias:2, deslocamento:'9m'},
+  clerigo:   {nome:'Clérigo',    dado:'d8',  pvBase:8,  saves:['sab','car'],  pericias:2, deslocamento:'9m'},
+  druida:    {nome:'Druida',     dado:'d8',  pvBase:8,  saves:['int','sab'],  pericias:2, deslocamento:'9m'},
+  feiticeiro:{nome:'Feiticeiro', dado:'d6',  pvBase:6,  saves:['con','car'],  pericias:2, deslocamento:'9m'},
+  guerreiro: {nome:'Guerreiro',  dado:'d10', pvBase:10, saves:['for','con'],  pericias:2, deslocamento:'9m'},
+  ladino:    {nome:'Ladino',     dado:'d8',  pvBase:8,  saves:['des','int'],  pericias:4, deslocamento:'9m'},
+  mago:      {nome:'Mago',       dado:'d6',  pvBase:6,  saves:['int','sab'],  pericias:2, deslocamento:'9m'},
+  monge:     {nome:'Monge',      dado:'d8',  pvBase:8,  saves:['for','des'],  pericias:2, deslocamento:'9m'},
+  paladino:  {nome:'Paladino',   dado:'d10', pvBase:10, saves:['sab','car'],  pericias:2, deslocamento:'9m'},
+  patrulheiro:{nome:'Patrulheiro',dado:'d10',pvBase:10, saves:['for','des'],  pericias:3, deslocamento:'9m'},
+};
+
+/* Bônus raciais de atributos e deslocamento */
+const RACAS_DATA={
+  anao_colina:       {nome:'Anão da Colina',    bonus:{con:2,sab:1},              deslocamento:'7,5m'},
+  anao_montanha:     {nome:'Anão da Montanha',  bonus:{for:2,con:2},              deslocamento:'7,5m'},
+  alto_elfo:         {nome:'Alto Elfo',         bonus:{des:2,int:1},              deslocamento:'9m'},
+  elfo_floresta:     {nome:'Elfo da Floresta',  bonus:{des:2,sab:1},              deslocamento:'10,5m'},
+  drow:              {nome:'Drow',              bonus:{des:2,car:1},              deslocamento:'9m'},
+  halfling_pesados:  {nome:'Halfling Pés-Pesados',bonus:{des:2,con:1},           deslocamento:'7,5m'},
+  halfling_pesosleves:{nome:'Halfling Pés-Leves',bonus:{des:2,car:1},            deslocamento:'7,5m'},
+  humano:            {nome:'Humano',            bonus:{for:1,des:1,con:1,int:1,sab:1,car:1}, deslocamento:'9m'},
+  draconato:         {nome:'Draconato',         bonus:{for:2,car:1},              deslocamento:'9m'},
+  gnomo_floresta:    {nome:'Gnomo da Floresta', bonus:{int:2,des:1},              deslocamento:'7,5m'},
+  gnomo_rochas:      {nome:'Gnomo das Rochas',  bonus:{int:2,con:1},              deslocamento:'7,5m'},
+  meio_elfo:         {nome:'Meio-Elfo',         bonus:{car:2},  bonusLivre:2,     deslocamento:'9m'},
+  meio_orc:          {nome:'Meio-Orc',          bonus:{for:2,con:1},              deslocamento:'9m'},
+  tiefling:          {nome:'Tiefling',          bonus:{int:1,car:2},              deslocamento:'9m'},
+  /* ── Guia do Volo ── */
+  aasimar_protegido: {nome:'Aasimar (Protegido)', bonus:{car:2,sab:1},             deslocamento:'9m'},
+  aasimar_caido:     {nome:'Aasimar (Caído)',     bonus:{car:2,for:1},             deslocamento:'9m'},
+  aasimar_flagelador:{nome:'Aasimar (Açoitador)',bonus:{car:2,con:1},             deslocamento:'9m'},
+  firbolg:           {nome:'Firbolg',             bonus:{sab:2,for:1},             deslocamento:'9m'},
+  golias:            {nome:'Golias',              bonus:{for:2,con:1},             deslocamento:'9m'},
+  kenku:             {nome:'Kenku',               bonus:{des:2,sab:1},             deslocamento:'9m'},
+  tabaxi:            {nome:'Tabaxi',              bonus:{des:2,car:1},             deslocamento:'9m'},
+  triton:            {nome:'Tritão',              bonus:{for:1,con:1,car:1},       deslocamento:'9m'},
+  lizardfolk:        {nome:'Homem-Lagarto',       bonus:{con:2,sab:1},             deslocamento:'9m'},
+  bugbear:           {nome:'Bugbear',             bonus:{for:2,des:1},             deslocamento:'9m'},
+  goblin:            {nome:'Goblin',              bonus:{des:2,con:1},             deslocamento:'9m', tamanho:'Pequeno'},
+  hobgoblin:         {nome:'Hobgoblin',           bonus:{con:2,int:1},             deslocamento:'9m'},
+  kobold:            {nome:'Kobold',              bonus:{des:2,for:-2},            deslocamento:'9m', tamanho:'Pequeno'},
+  orc_volo:          {nome:'Orc',                bonus:{for:2,con:1,int:-2},      deslocamento:'9m'},
+  yuan_ti_puro:      {nome:'Yuan-ti Puro-Sangue', bonus:{car:2,int:1},             deslocamento:'9m'},
+
+  /* ── Mordenkainen: Monstros do Multiverso ── */
+  /* Nota: No sistema MM, o jogador distribui +2/+1 ou +1/+1/+1 livremente.
+     Aqui registramos como bonusLivre para indicar isso ao usuário. */
+  aarakocra:         {nome:'Aarakocra',           bonus:{},  bonusLivre:3, deslocamento:'9m', voo:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  aasimar_mm:        {nome:'Aasimar (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  bugurso:           {nome:'Bugurso',             bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  centauro:          {nome:'Centauro',            bonus:{},  bonusLivre:3, deslocamento:'12m', tipo:'Feérico', tamanho:'Médio'},
+  duergar:           {nome:'Duergar',             bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Anão)', tamanho:'Médio'},
+  duplicante:        {nome:'Duplicante',          bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Feérico', tamanho:'Médio ou Pequeno'},
+  eladrin:           {nome:'Eladrin',             bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Elfo)', tamanho:'Médio'},
+  elfo_marinho:      {nome:'Elfo Marinho',        bonus:{},  bonusLivre:3, deslocamento:'9m', nado:'9m', tipo:'Humanoide (Elfo)', tamanho:'Médio'},
+  fada:              {nome:'Fada',                bonus:{},  bonusLivre:3, deslocamento:'9m', voo:'9m', tipo:'Feérico', tamanho:'Pequeno'},
+  firbolg_mm:        {nome:'Firbolg (MM)',        bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  genasi_agua:       {nome:'Genasi da Água',      bonus:{},  bonusLivre:3, deslocamento:'9m', nado:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  genasi_ar:         {nome:'Genasi do Ar',        bonus:{},  bonusLivre:3, deslocamento:'10,5m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  genasi_fogo:       {nome:'Genasi do Fogo',      bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  genasi_terra:      {nome:'Genasi da Terra',     bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  githyanki:         {nome:'Githyanki',           bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  githzerai:         {nome:'Githzerai',           bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  gnomo_profundezas: {nome:'Gnomo das Profundezas',bonus:{}, bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Gnomo)', tamanho:'Pequeno'},
+  goblin_mm:         {nome:'Goblin (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Goblinoide)', tamanho:'Pequeno'},
+  golias_mm:         {nome:'Golias (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  hobgoblin_mm:      {nome:'Hobgoblin (MM)',      bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Goblinoide)', tamanho:'Médio'},
+  kenku_mm:          {nome:'Kenku (MM)',          bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  kobold_mm:         {nome:'Kobold (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Pequeno'},
+  laparlonj:         {nome:'Laparlonj',           bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  minotauro:         {nome:'Minotauro',           bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  morfo:             {nome:'Morfo',               bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  orc_mm:            {nome:'Orc (MM)',            bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  reptante:          {nome:'Reptante',            bonus:{},  bonusLivre:3, deslocamento:'9m', nado:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  satiro:            {nome:'Sátiro',              bonus:{},  bonusLivre:3, deslocamento:'10,5m', tipo:'Feérico', tamanho:'Médio'},
+  shadar_kai:        {nome:'Shadar-kai',          bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide (Elfo)', tamanho:'Médio'},
+  tabaxi_mm:         {nome:'Tabaxi (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', escalada:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  tortuga:           {nome:'Tortuga',             bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  triton_mm:         {nome:'Tritão (MM)',         bonus:{},  bonusLivre:3, deslocamento:'9m', nado:'9m', tipo:'Humanoide', tamanho:'Médio'},
+  yuan_ti_mm:        {nome:'Yuan-ti (MM)',        bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+
+  /* ── Guia de Van Richten para Ravenloft — Linhagens ──
+     Linhagens são raças que substituem a raça original do personagem
+     (Aumento no Valor de Atributo antigo é substituído pelo da linhagem).
+     Todas seguem a mesma regra de atributo: aumente um valor em 2 e
+     outro em 1, ou três valores diferentes em 1 (aqui registrado como
+     bonusLivre, igual ao sistema usado nas raças de Monstros do Multiverso).
+     Traço comum a todas — Legado Ancestral: se você substituir uma raça
+     por uma linhagem, mantém as proficiências de perícia e os
+     deslocamentos de escalada/voo/natação que tinha; caso não mantenha
+     nenhum desses elementos (ou escolha a linhagem já na criação),
+     ganha proficiência em duas perícias à sua escolha.
+
+     DAMPIR — Tipo: Humanoide. Tamanho: Médio ou Pequeno. Deslocamento:
+     10,5m. Visão no Escuro 18m (tons de cinza no escuro). Natureza
+     Imortal: não precisa respirar. Escalada de Aranha: deslocamento de
+     escalada igual ao de caminhada; a partir do 3º nível pode se mover
+     em superfícies verticais e de cabeça para baixo em tetos com as mãos
+     livres. Mordida Vampírica: arma natural corpo a corpo simples
+     (usa Constituição em vez de Força no ataque/dano), 1d4 perfurante;
+     com metade ou menos de PV, vantagem nos ataques com a mordida; ao
+     acertar uma criatura que não seja constructo/morto-vivo, pode se
+     empoderar (recupera PV igual ao dano causado OU ganha bônus igual
+     ao dano no próximo teste de atributo/ataque) um número de vezes
+     igual ao bônus de proficiência, recuperando ao final de descanso
+     longo. Fomes de Dampir (d6): sangue; carne humana/crua; fluido
+     cerebral espinhal; energia psíquica; sonhos; energia vital.
+     Origens de Dampir (d8): reencarnação de tirano vampírico; pacto com
+     divindade predadora/ínfero/feérico/espírito; sobreviveu a ataque de
+     vampiro; parasita interno; tragédia interrompeu transformação em
+     imortal; forma menor de ser de outro mundo; um dos pais era vampiro;
+     experimento radical o tornou dependente de fluidos vitais. Ligações
+     com domínios: Baróvia, Darkon (Kargatane), I'Cath.
+
+     RENASCIDO — Tipo: Humanoide. Tamanho: Médio ou Pequeno. Deslocamento:
+     9m. Natureza Imortal: vantagem em salvaguardas contra doença e
+     veneno e resistência a dano venenoso; vantagem em salvaguardas
+     contra a morte; não precisa comer, beber ou respirar; não precisa
+     dormir e magia não o faz dormir; pode terminar descanso longo em
+     4 horas ficando inativo e imóvel (mantendo a consciência).
+     Conhecimento de Uma Vida Passada: em um teste de atributo que use
+     perícia, após ver o resultado do d20 pode rolar 1d6 e somar ao
+     teste; usos = bônus de proficiência, recupera em descanso longo.
+     Memórias Perdidas (d6): momento fisicamente doloroso; memória que
+     traz lágrimas; lembrança de infância; voz de alguém próximo;
+     algo que gostava mas não suporta mais; odor/sensação vívida.
+     Origens de Renascido (d8): ressuscitado magicamente mas algo deu
+     errado; corpo costurado de partes desiguais com memórias de várias
+     vidas; sem memórias exceto um nome; foi servo morto-vivo de
+     necromante; acordou em laboratório com projetos de órgãos/engrenagens;
+     foi petrificado por gerações; espírito possessor compartilha
+     memórias e substitui membros perdidos; corpo recheado de palha
+     se passando por normal. Ligações com domínios: Har'Akir, Lamordia,
+     Mordent (o Aparato).
+
+     SANGUE DE BRUXA — Tipo: Feérico. Tamanho: Médio ou Pequeno.
+     Deslocamento: 9m. Visão no Escuro 18m (tons de cinza no escuro).
+     Troféu Sinistro: ação bônus remove mecha de cabelo/unha/dente,
+     ficando imbuído de magia até descanso longo (um de cada vez);
+     enquanto imbuído: Mensagem Telepática (ação, até 15km, até 25
+     palavras) e Visão Remota (ação, transe de 1 min a até 15km, vê/ouve
+     pelo troféu mas fica cego/surdo aos próprios arredores). Magia das
+     Bruxas: conjura disfarçar-se e amaldiçoar (uma vez cada por
+     descanso longo, ou usando espaços de magia); atributo de
+     conjuração é Int, Sab ou Car (escolhido ao adquirir a linhagem).
+     Origens de Sangue de Bruxa (d6): pais fizeram barganha com megera
+     por um filho; trocado por feéricos sequestradores; criado para
+     substituir megera perdida de uma laia; amaldiçoado na infância por
+     espíritos da floresta; começou como criatura feérica e sofreu
+     acidente; druida o transformou e vinculou sua vida a uma árvore
+     sagrada. Ligações com domínios: Hazlan, Kartakass, Tepest (Viktal).
+  */
+  dampir:            {nome:'Dampir',              bonus:{},  bonusLivre:3, deslocamento:'10,5m', escalada:'10,5m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  renascido:         {nome:'Renascido',           bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Humanoide', tamanho:'Médio ou Pequeno'},
+  sangue_bruxa:      {nome:'Sangue de Bruxa',     bonus:{},  bonusLivre:3, deslocamento:'9m', tipo:'Feérico', tamanho:'Médio ou Pequeno'},
+};
+
+/* Atributos base digitados pelo usuário (sem bônus racial) */
+let BASE_ATTRS={for:10,des:10,con:10,int:10,sab:10,car:10};
+
+/* ─── HANDLER: Classe mudou ─── */
+function onClasseChange(){
+  const cls=document.getElementById('classe_sel').value;
+  const niv=parseInt(document.getElementById('nivel_sel').value)||1;
+  applyClassData(cls,niv);
+  updateInfoBar();
+  recalcAll();
+}
+
+/* ─── HANDLER: Nível mudou ─── */
+function onNivelChange(){
+  const cls=document.getElementById('classe_sel').value;
+  const niv=parseInt(document.getElementById('nivel_sel').value)||1;
+  applyClassData(cls,niv);
+  updateMulticlasseGate();
+  updateInfoBar();
+  recalcAll();
+}
+
+/* ─── MULTICLASSE (PHB p.163-164) ───
+   Regra: só é possível fazer multiclasse ao avançar de nível, ou seja,
+   a segunda classe só fica disponível a partir do nível de personagem 2. */
+const MULTICLASSE_PREREQ={
+  barbaro:'Força 13', bardo:'Carisma 13', bruxo:'Carisma 13', clerigo:'Sabedoria 13',
+  druida:'Sabedoria 13', feiticeiro:'Carisma 13', guerreiro:'Força 13 ou Destreza 13',
+  ladino:'Destreza 13', mago:'Inteligência 13', monge:'Destreza 13 e Sabedoria 13',
+  paladino:'Força 13 e Carisma 13', patrulheiro:'Destreza 13 e Sabedoria 13'
+};
+const MULTICLASSE_PROF={
+  barbaro:'Escudos, armas simples, armas marciais',
+  bardo:'Armadura leve, uma perícia à escolha, um instrumento musical à escolha',
+  bruxo:'Armadura leve, armas simples',
+  clerigo:'Armadura leve, armadura média, escudos',
+  druida:'Armadura leve, armadura média, escudos (não metálicos)',
+  feiticeiro:'—',
+  guerreiro:'Armadura leve, armadura média, escudos, armas simples, armas marciais',
+  ladino:'Armadura leve, uma perícia da lista da classe, ferramentas de ladrão',
+  mago:'—',
+  monge:'Armas simples, espadas curtas',
+  paladino:'Armadura leve, armadura média, escudos, armas simples, armas marciais',
+  patrulheiro:'Armadura leve, armadura média, escudos, armas simples, armas marciais, uma perícia da lista da classe'
+};
+
+function updateMulticlasseGate(){
+  const niv=parseInt(document.getElementById('nivel_sel').value)||1;
+  const sel=document.getElementById('classe2_sel');
+  const wrap=document.getElementById('classe2_wrap');
+  const lbl=document.getElementById('classe2_lbl');
+  if(!sel||!wrap)return;
+  const unlocked=niv>=2;
+  sel.disabled=!unlocked;
+  wrap.classList.toggle('locked',!unlocked);
+  if(lbl) lbl.textContent = unlocked ? '⚔ Multiclasse' : '🔒 Multiclasse (Nv. 2+)';
+  sel.title = unlocked ? 'Segunda classe (multiclasse) — PHB p.163' : 'Disponível a partir do nível 2 (PHB p.163)';
+  if(!unlocked && sel.value){
+    sel.value='';
+    showMulticlasseInfo('');
+  }
+}
+
+/* ─── HANDLER: Multiclasse mudou ─── */
+function onClasse2Change(){
+  showMulticlasseInfo(document.getElementById('classe2_sel').value);
+}
+
+function showMulticlasseInfo(cls2){
+  let infoEl=document.getElementById('classe2_info');
+  if(!cls2){
+    if(infoEl) infoEl.remove();
+    return;
+  }
+  const prereq=MULTICLASSE_PREREQ[cls2]||'—';
+  const prof=MULTICLASSE_PROF[cls2]||'—';
+  if(!infoEl){
+    infoEl=document.createElement('div');
+    infoEl.id='classe2_info';
+    const wrap=document.getElementById('classe2_wrap');
+    if(wrap) wrap.appendChild(infoEl);
+  }
+  infoEl.innerHTML='<b>Pré-requisito:</b> '+prereq+'<br><b>Proficiências ganhas:</b> '+prof;
+}
+
+/* ─── HANDLER: XP mudou → auto nível ─── */
+function onXPChange(){
+  const xp=parseInt(document.getElementById('xp').value)||0;
+  let niv=1;
+  for(let i=1;i<XP_BY_LEVEL.length;i++){if(xp>=XP_BY_LEVEL[i])niv=i;}
+  document.getElementById('nivel_sel').value=String(niv);
+  onNivelChange();
+}
+
+/* ─── HANDLER: Raça mudou ─── */
+function onRacaChange(){
+  applyRacialBonuses();
+  updateInfoBar();
+  recalcAll();
+}
+
+/* ─── Aplica dados da classe ─── */
+function applyClassData(cls,niv){
+  if(!cls)return;
+  const cd=CLASSES_DATA[cls];if(!cd)return;
+  /* Bônus de proficiência */
+  const prof=PROF_BY_LEVEL[niv]||2;
+  document.getElementById('prof_bonus').value='+'+prof;
+  /* Dado de vida */
+  document.getElementById('dados_tipo').value=cd.dado;
+  document.getElementById('dados_total').value=niv;
+  /* Deslocamento racial ou classe */
+  const raca=document.getElementById('raca_sel').value;
+  const rd=RACAS_DATA[raca];
+  document.getElementById('desloc').value=(rd?rd.deslocamento:cd.deslocamento);
+  /* PV máximos: dado máximo nível 1 + con_mod + (dado_médio + con_mod) × (niv-1)
+     — só recalcula se o usuário não tiver editado o PV Máximo manualmente */
+  const pvMaxEl=document.getElementById('pv_max');
+  if(pvMaxEl.dataset.manual!=='1'){
+    const conMod=getMod('con');
+    const dadoMax=parseInt(cd.dado.replace('d',''));
+    const dadoMed=Math.ceil(dadoMax/2)+1;
+    const pvMax=dadoMax+conMod+Math.max(0,(niv-1))*(dadoMed+conMod);
+    pvMaxEl.value=pvMax;
+    document.getElementById('pv_atual').value=pvMax;
+  }
+  /* Marca testes de resistência da classe */
+  ATTRS.forEach(a=>{
+    const cb=document.getElementById('sv_'+a.id);
+    if(cb) cb.checked=cd.saves.includes(a.id);
+  });
+}
+
+/* ─── Aplica bônus raciais nos atributos ─── */
+function applyRacialBonuses(){
+  const raca=document.getElementById('raca_sel').value;
+  const rd=RACAS_DATA[raca];
+  ATTRS.forEach(a=>{
+    const base=BASE_ATTRS[a.id]||10;
+    const bonus=(rd&&rd.bonus&&rd.bonus[a.id])||0;
+    const final=Math.max(1, base+bonus);
+    document.getElementById(a.id+'_val').value=final;
+    calcMod(a.id);
+  });
+  /* Deslocamento */
+  const deslocEl=document.getElementById('desloc');
+  if(rd&&deslocEl) deslocEl.value=rd.deslocamento;
+  /* Info da raça MM */
+  showRaceInfo(rd);
+}
+
+/* ─── Exibe informações extras da raça (MM) ─── */
+function showRaceInfo(rd){
+  let infoEl=document.getElementById('race_info_bar');
+  /* Build info text first — only show bar if there's something to say */
+  let info=[];
+  if(rd){
+    if(rd.bonusLivre) info.push('⚠ Distribuir +2/+1 ou +1/+1/+1 em atributos à escolha (Regra MM)');
+    if(rd.voo) info.push('✈ Voo: '+rd.voo);
+    if(rd.nado) info.push('🌊 Natação: '+rd.nado);
+    if(rd.escalada) info.push('🧗 Escalada: '+rd.escalada);
+    if(rd.tamanho&&(rd.tamanho.indexOf('ou')!==-1)) info.push('Tamanho: '+rd.tamanho);
+  }
+  if(!info.length){
+    /* Nothing to show — remove bar if it exists */
+    if(infoEl) infoEl.remove();
+    return;
+  }
+  if(!infoEl){
+    infoEl=document.createElement('div');
+    infoEl.id='race_info_bar';
+    infoEl.style.cssText='font-size:9px;color:#555;padding:3px 6px;background:#f9f6f0;border:1px solid #ddd;border-radius:2px;margin-top:3px;line-height:1.5;';
+    const racaSel=document.getElementById('raca_sel');
+    if(racaSel&&racaSel.parentNode) racaSel.parentNode.appendChild(infoEl);
+  }
+  infoEl.textContent=info.join(' · ');
+}
+
+/* ─── Captura base attrs ao digitar ─── */
+function onAttrInput(id){
+  const v=parseInt(document.getElementById(id+'_val').value)||10;
+  const raca=document.getElementById('raca_sel').value;
+  const rd=RACAS_DATA[raca];
+  const bonus=(rd&&rd.bonus&&rd.bonus[id])||0;
+  BASE_ATTRS[id]=Math.max(1, v-bonus); /* salva sem bônus racial, mínimo 1 */
+  calcMod(id);
+}
+
+/* ─── Info bar (noop — elemento removido, mantido para compatibilidade) ─── */
+function updateInfoBar(){
+  /* info_bar foi removido do DOM — função mantida para evitar erros de chamada */
+}
+
+/* ─── Recalcula tudo após carregar uma ficha (troca de personagem, exclusão, ou load inicial) ───
+   Sem isso, os campos ficam com os valores brutos salvos, mas os modificadores, perícias,
+   resistências, PV e bônus raciais/de classe continuam mostrando os dados do personagem anterior
+   até o usuário editar algo manualmente. */
+function refreshAfterLoad(){
+  const racaEl=document.getElementById('raca_sel');
+  const rd = racaEl ? RACAS_DATA[racaEl.value] : null;
+  /* recalcula BASE_ATTRS a partir do valor final salvo (removendo bônus racial) */
+  ATTRS.forEach(a=>{
+    const el=document.getElementById(a.id+'_val');
+    if(!el)return;
+    const v=parseInt(el.value)||10;
+    const bonus=(rd&&rd.bonus&&rd.bonus[a.id])||0;
+    BASE_ATTRS[a.id]=v-bonus;
+  });
+  ATTRS.forEach(a=>calcMod(a.id));
+  recalcAll();
+  updateInfoBar();
+
+  /* reaplica classe e raça salvas, se houver */
+  const clsEl=document.getElementById('classe_sel');
+  const nivEl=document.getElementById('nivel_sel');
+  if(clsEl&&nivEl){
+    const cls=clsEl.value;
+    const niv=parseInt(nivEl.value)||1;
+    if(cls) applyClassData(cls,niv);
+    if(racaEl&&racaEl.value) applyRacialBonuses();
+    updateMulticlasseGate();
+    const cls2El=document.getElementById('classe2_sel');
+    if(cls2El&&cls2El.value) showMulticlasseInfo(cls2El.value);
+  }
+  const antecSelEl=document.getElementById('antecedente_sel');
+  if(antecSelEl&&antecSelEl.value) applyAntecedente();
+
+  ATTRS.forEach(a=>calcMod(a.id));
+  recalcAll();
+}
+
+
+
+/* ═══════════════════════════════════════════
+   ANTECEDENTES — PHB p.127-143
+═══════════════════════════════════════════ */
+const ANTECEDENTES_DATA={
+  acolito:        {nome:'Acólito',         pericias:['intuicao','religiao'],      idiomas:2},
+  artesao_guilda: {nome:'Artesão de Guilda',pericias:['historia_sk','persuasao'], idiomas:1},
+  charlatan:      {nome:'Charlatão',       pericias:['enganacao','prestidigitacao']},
+  criminoso:      {nome:'Criminoso',       pericias:['furtividade','enganacao']},
+  entretenedor:   {nome:'Entretenedor',    pericias:['acrobacia','atuacao']},
+  heroi_povo:     {nome:'Herói do Povo',   pericias:['adestrar_animais','sobrevivencia']},
+  marinheiro:     {nome:'Marinheiro',      pericias:['atletismo','percepcao']},
+  nobre:          {nome:'Nobre',           pericias:['historia_sk','persuasao'],  idiomas:1},
+  fora_lei:       {nome:'Fora-da-Lei',     pericias:['furtividade','enganacao']},
+  forasteiro:     {nome:'Forasteiro',      pericias:['atletismo','sobrevivencia'], idiomas:2},
+  eremita:        {nome:'Eremita',         pericias:['medicina','religiao'],       idiomas:1},
+  sabio:          {nome:'Sábio',           pericias:['arcanismo','historia_sk'],   idiomas:2},
+  soldado:        {nome:'Soldado',         pericias:['atletismo','intimidacao']},
+  urchin:         {nome:'Órfão de Rua',    pericias:['furtividade','prestidigitacao']},
+};
+
+/* Mapa de id de perícia para nome amigável (para pericias de antecedente
+   que não existem no SKILLS, como adestrar_animais -> animais) */
+const ANTEC_SKILL_MAP={
+  adestrar_animais:'animais',
+  enganacao:'blefar',
+};
+
+function onAntecChange(){
+  applyAntecedente();
+  recalcAll();
+}
+
+function applyAntecedente(){
+  const ant=document.getElementById('antecedente_sel').value;
+  const ad=ANTECEDENTES_DATA[ant];
+  /* Nada marcado ainda — apenas recalcula; o usuário ainda escolhe as perícias */
+  /* Mas marcamos as perícias fixas do antecedente automaticamente */
+  if(!ad)return;
+  /* Desmarca todas as perícias de antecedente anteriores para não acumular */
+  Object.values(ANTECEDENTES_DATA).forEach(a=>{
+    (a.pericias||[]).forEach(pid=>{
+      const realId=ANTEC_SKILL_MAP[pid]||pid;
+      const cb=document.getElementById('sk_'+realId);
+      /* Só desmarca se não for proficiência de classe */
+      if(cb&&cb.dataset.fromAntec==='1') cb.checked=false;
+    });
+  });
+  /* Marca as perícias do antecedente selecionado */
+  (ad.pericias||[]).forEach(pid=>{
+    const realId=ANTEC_SKILL_MAP[pid]||pid;
+    const cb=document.getElementById('sk_'+realId);
+    if(cb){cb.checked=true;cb.dataset.fromAntec='1';}
+  });
+}
+
+buildAttrs();
+buildSaves();
+buildSkills();
+buildAtks();
+buildSpells();
+/* ───────── SUPABASE: LOGIN + SINCRONIZAÇÃO ───────── */
+const SUPABASE_URL = 'https://fzuueqehobfuesqlmtsf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WvuPwwnsarqC5-hj0SyAvw_Z-CK7hpP';
+const sb = (window.supabase && !SUPABASE_URL.startsWith('COLE'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+let userId = null;
+let appStarted = false;
+const PEND_KEY = 'dnd5e_pending', OWNER_KEY = 'dnd5e_owner';
+
+function getPend(){ try{ return JSON.parse(localStorage.getItem(PEND_KEY)) || []; }catch(e){ return []; } }
+function setPend(a){ localStorage.setItem(PEND_KEY, JSON.stringify([...new Set(a)])); }
+function addPend(id){ setPend(getPend().concat(id)); }
+function delPend(id){ setPend(getPend().filter(x => x !== id)); }
+function wipeLocal(){
+  Object.keys(localStorage).filter(k => k.startsWith('dnd5e_')).forEach(k => localStorage.removeItem(k));
+}
+
+async function cloudPush(id){
+  const raw = localStorage.getItem(CHAR_PREFIX + id);
+  if(!raw || !sb || !userId) return true;
+  const entry = getIndex().find(c => c.id === id);
+  try{
+    const { error } = await sb.from('personagens').upsert({
+      id, user_id: userId, nome: entry ? entry.name : '',
+      dados: JSON.parse(raw), atualizado_em: new Date().toISOString()
+    });
+    if(error) throw error;
+    delPend(id);
+    return true;
+  }catch(e){ addPend(id); console.warn('Falha ao sincronizar', e); return false; }
+}
+
+async function cloudDelete(id){
+  delPend(id);
+  if(!sb || !userId) return;
+  const { error } = await sb.from('personagens').delete().eq('id', id);
+  if(error) alert('Não foi possível apagar na nuvem: ' + error.message);
+}
+
+/* salvar: grava local (como antes) e envia ao servidor */
+const _saveSheet = saveSheet;
+saveSheet = async function(silent){
+  const id = currentCharId;
+  _saveSheet(silent);
+  const ok = await cloudPush(id);
+  if(!silent && !ok){
+    const b = document.querySelector('.tbtn-save');
+    b.textContent = '⚠ Só local';
+    setTimeout(() => b.textContent = '💾 Salvar', 2500);
+  }
+};
+
+/* apagar: remove também na nuvem */
+const _deleteCharacter = deleteCharacter;
+deleteCharacter = function(){
+  const id = currentCharId;
+  _deleteCharacter();
+  if(!getIndex().some(c => c.id === id)) cloudDelete(id);
+};
+
+/* ── tela de login ── */
+function authIn(f){ return document.querySelector('#auth_box [data-f="' + f + '"]'); }
+function authMsg(t, ok){ const m = document.getElementById('auth_msg'); m.textContent = t || ''; m.style.color = ok ? '#8c8' : '#e88'; }
+function authBusy(b){ document.querySelectorAll('#auth_box button').forEach(x => x.disabled = b); }
+function authErr(m){
+  m = (m || '').toLowerCase();
+  if(m.includes('invalid login')) return 'E-mail ou senha incorretos.';
+  if(m.includes('not confirmed')) return 'Confirme seu e-mail antes de entrar.';
+  if(m.includes('already registered')) return 'Este e-mail já está cadastrado.';
+  if(m.includes('password should')) return 'A senha precisa ter pelo menos 6 caracteres.';
+  if(m.includes('rate limit')) return 'Muitas tentativas. Aguarde um pouco.';
+  return 'Erro: ' + m;
+}
+function authRedirect(){ return location.origin + location.pathname; }
+
+async function doLogin(){
+  const email = authIn('email').value.trim(), password = authIn('pass').value;
+  if(!email || !password){ authMsg('Preencha e-mail e senha.'); return; }
+  authBusy(true); authMsg('Entrando…', true);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  authBusy(false);
+  if(error){ authMsg(authErr(error.message)); return; }
+  await startApp(data.user);
+}
+async function doSignup(){
+  const email = authIn('email').value.trim(), password = authIn('pass').value;
+  if(!email || !password){ authMsg('Preencha e-mail e senha.'); return; }
+  if(password.length < 6){ authMsg('A senha precisa ter pelo menos 6 caracteres.'); return; }
+  authBusy(true); authMsg('Criando conta…', true);
+  const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: authRedirect() } });
+  authBusy(false);
+  if(error){ authMsg(authErr(error.message)); return; }
+  if(data.user && data.user.identities && data.user.identities.length === 0){ authMsg('Este e-mail já está cadastrado.'); return; }
+  if(data.session) await startApp(data.user);
+  else authMsg('Conta criada! Confirme pelo link enviado ao seu e-mail e depois entre.', true);
+}
+async function doReset(){
+  const email = authIn('email').value.trim();
+  if(!email){ authMsg('Digite seu e-mail acima primeiro.'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: authRedirect() });
+  if(error) authMsg(authErr(error.message));
+  else authMsg('Enviamos um link para redefinir a senha.', true);
+}
+async function doLogout(){
+  if(currentCharId) await saveSheet(true);
+  for(const id of getPend()) await cloudPush(id);
+  if(getPend().length && !confirm('Há alterações que não foram enviadas ao servidor e serão perdidas ao sair. Sair mesmo?')) return;
+  wipeLocal();
+  await sb.auth.signOut();
+  location.reload();
+}
+
+/* ── inicia o app depois do login ── */
+async function startApp(user){
+  if(appStarted) return;
+  appStarted = true;
+  userId = user.id;
+  const owner = localStorage.getItem(OWNER_KEY);
+  if(owner && owner !== userId) wipeLocal();          /* outro usuário usou este aparelho */
+  const firstClaim = owner !== userId;
+  localStorage.setItem(OWNER_KEY, userId);
+
+  /* 1) envia o que ficou pendente (alterações feitas offline) */
+  for(const id of getPend()) await cloudPush(id);
+
+  /* 2) baixa os personagens da nuvem */
+  let rows = null;
+  try{
+    const { data, error } = await sb.from('personagens').select('id,nome,dados').order('atualizado_em', { ascending: true });
+    if(error) throw error;
+    rows = data;
+  }catch(e){ console.warn(e); alert('Sem conexão com o servidor. Usando os dados locais deste aparelho.'); }
+
+  const remoteIds = new Set();
+  if(rows){
+    let idx = getIndex();
+    const pend = getPend();
+    rows.forEach(r => {
+      remoteIds.add(r.id);
+      if(pend.includes(r.id)) return;                 /* versão local ainda não enviada: mantém */
+      localStorage.setItem(CHAR_PREFIX + r.id, JSON.stringify(r.dados));
+      const e = idx.find(c => c.id === r.id);
+      if(e) e.name = r.nome || e.name; else idx.push({ id: r.id, name: r.nome || '(sem nome)' });
+    });
+    if(!firstClaim){                                  /* apagados em outro aparelho somem aqui */
+      idx = idx.filter(c => {
+        const keep = remoteIds.has(c.id) || pend.includes(c.id) || !localStorage.getItem(CHAR_PREFIX + c.id);
+        if(!keep) localStorage.removeItem(CHAR_PREFIX + c.id);
+        return keep;
+      });
+    }
+    setIndex(idx);
+  }
+
+  initCharacters();
+  loadSheet();
+  refreshAfterLoad();
+  document.getElementById('auth_overlay').style.display = 'none';
+  document.getElementById('user_email').textContent = user.email || '';
+
+  /* primeiro login neste aparelho: sobe personagens locais que ainda não estão na nuvem */
+  if(rows && firstClaim){
+    for(const c of getIndex()){ if(!remoteIds.has(c.id)) await cloudPush(c.id); }
+  }
+}
+
+(async function(){
+  if(!sb){
+    authMsg('Configure SUPABASE_URL e SUPABASE_KEY no código do arquivo.');
+    authBusy(true);
+    return;
+  }
+  sb.auth.onAuthStateChange(event => {
+    if(event === 'PASSWORD_RECOVERY'){
+      setTimeout(() => {
+        const p = prompt('Digite a nova senha (mínimo 6 caracteres):');
+        if(p) sb.auth.updateUser({ password: p }).then(({ error }) => alert(error ? authErr(error.message) : 'Senha alterada!'));
+      }, 0);
+    }
+  });
+  const { data } = await sb.auth.getSession();
+  if(data.session) await startApp(data.session.user);
+})();
+
+/* recalc when prof bonus changes manually */
+const profBonusEl=document.getElementById('prof_bonus');
+if(profBonusEl) profBonusEl.addEventListener('input', recalcAll);
+
+/* ───────── SCALE PAGES TO FIT VIEWPORT ───────── */
+function scalePages(){
+  const PAGE_W=794;
+  const vw=window.innerWidth;
+  const padding=28; /* 14px each side */
+  const available=vw-padding;
+  const scale=available<PAGE_W ? available/PAGE_W : 1;
+  document.querySelectorAll('.page').forEach(p=>{
+    p.style.transform=`scale(${scale})`;
+    /* collapse the whitespace left by scale */
+    const scaledH=p.offsetHeight*scale;
+    p.style.marginBottom=`${14-(p.offsetHeight-scaledH)}px`;
+  });
+  /* also adjust .pages container width */
+  document.querySelectorAll('.pages').forEach(pg=>{
+    pg.style.width='100%';
+  });
+}
+scalePages();
+window.addEventListener('resize',scalePages);
+</script>
+</body>
+</html>
