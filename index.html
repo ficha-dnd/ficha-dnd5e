@@ -223,7 +223,16 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
 #auth_msg.ok{display:block;color:#a9d9a9;background:rgba(90,160,90,.1);border-color:rgba(90,160,90,.4);}
 @media (max-width:420px){#auth_box{padding:28px 20px 22px;}#auth_box .auth-title{font-size:21px;letter-spacing:2px;}}
 @media (prefers-reduced-motion:reduce){#auth_overlay::before,#auth_overlay::after,#auth_box .auth-view{animation:none;}}
-@media print{#auth_overlay{display:none!important;}}
+#ask_overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.72);font-family:'Cuprum','Scada',Arial,sans-serif;}
+#ask_box{width:min(100%,400px);padding:24px 22px 20px;border-radius:4px;background:linear-gradient(180deg,#1d1a1a,#131212);border:1px solid #3b2b2b;box-shadow:0 24px 70px rgba(0,0,0,.75);}
+#ask_msg{color:#e8e0d0;font-size:15px;line-height:1.45;white-space:pre-line;margin-bottom:18px;}
+#ask_btns{display:flex;gap:10px;}
+#ask_btns button{flex:1;border-radius:3px;padding:11px;font-size:14px;letter-spacing:2px;text-transform:uppercase;font-family:inherit;cursor:pointer;transition:background .2s,border-color .2s;}
+#ask_yes{background:linear-gradient(180deg,#8a2323,#651818);border:1px solid #b33;color:#fff;}
+#ask_yes:hover{background:linear-gradient(180deg,#9c2828,#741c1c);}
+#ask_no{background:transparent;border:1px solid #4a4238;color:#c9b27c;}
+#ask_no:hover{background:rgba(201,178,124,.08);border-color:#c9b27c;}
+@media print{#auth_overlay,#ask_overlay{display:none!important;}}
 </style>
 </head>
 <body>
@@ -267,6 +276,15 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
     </div>
 
     <div id="auth_msg"></div>
+  </div>
+</div>
+<div id="ask_overlay">
+  <div id="ask_box">
+    <div id="ask_msg"></div>
+    <div id="ask_btns">
+      <button type="button" id="ask_yes">Sim</button>
+      <button type="button" id="ask_no">Não</button>
+    </div>
   </div>
 </div>
 <div class="app-wrap">
@@ -1131,24 +1149,46 @@ function exportBackup(){
   URL.revokeObjectURL(url);
 }
 
+/* ─── Pergunta com botões Sim / Não ─── */
+function askYesNo(msg){
+  return new Promise(res=>{
+    const ov=document.getElementById('ask_overlay');
+    document.getElementById('ask_msg').textContent=msg;
+    ov.style.display='flex';
+    const done=v=>{ ov.style.display='none'; res(v); };
+    document.getElementById('ask_yes').onclick=()=>done(true);
+    document.getElementById('ask_no').onclick=()=>done(false);
+  });
+}
+
 /* ─── RESTAURAR: importa personagens de um arquivo .json de backup ─── */
 function importBackup(file){
   if(!file)return;
   const reader=new FileReader();
-  reader.onload=function(e){
+  reader.onload=async function(e){
     try{
       const data=JSON.parse(e.target.result);
       if(!data._index) throw new Error('Formato inválido');
       const existingIdx=getIndex();
       const existingIds=new Set(existingIdx.map(c=>c.id));
       let firstImportedId=null;
-      data._index.forEach(c=>{
+      const backupCount=data._index.filter(c=>data[CHAR_PREFIX+c.id]).length;
+      for(const c of data._index){
         const raw=data[CHAR_PREFIX+c.id];
-        if(!raw)return;
+        if(!raw)continue;
         let finalId;
         if(existingIds.has(c.id)){
           /* o personagem já existe nesta conta: substitui o original pelos dados do backup */
           finalId=c.id;
+          localStorage.setItem(CHAR_PREFIX+finalId, raw);
+          const ex=existingIdx.find(x=>x.id===finalId);
+          if(ex) ex.name=c.name;
+        } else if(backupCount===1 && currentCharId && existingIdx.some(x=>x.id===currentCharId) &&
+                  await askYesNo('Este backup ("'+c.name+'") não corresponde a nenhum personagem desta conta.\n\n'+
+                          'Deseja substituir o personagem atual ("'+((existingIdx.find(x=>x.id===currentCharId)||{}).name||'sem nome')+'") pelos dados do backup?\n\n'+
+                          'Sim = substitui o personagem atual\nNão = cria um novo personagem')){
+          /* backup sem correspondência: o usuário escolheu substituir o personagem atual */
+          finalId=currentCharId;
           localStorage.setItem(CHAR_PREFIX+finalId, raw);
           const ex=existingIdx.find(x=>x.id===finalId);
           if(ex) ex.name=c.name;
@@ -1160,7 +1200,7 @@ function importBackup(file){
         }
         addPend(finalId);
         if(!firstImportedId) firstImportedId=finalId;
-      });
+      }
       if(!firstImportedId) throw new Error('Nenhum personagem encontrado no backup');
       setIndex(existingIdx);
       /* garante que, após recarregar, o personagem importado seja o exibido */
