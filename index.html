@@ -1211,7 +1211,6 @@ function importBackup(file){
       refreshAfterLoad();
       renderSelector();
       for(const id of getPend()) await cloudPush(id);
-      alert('Backup restaurado com sucesso!');
     }catch(err){
       alert('Não foi possível ler o arquivo de backup: '+err.message);
     }
