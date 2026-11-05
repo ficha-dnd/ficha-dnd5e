@@ -1145,10 +1145,19 @@ function importBackup(file){
       data._index.forEach(c=>{
         const raw=data[CHAR_PREFIX+c.id];
         if(!raw)return;
-        /* sempre gera id novo: evita conflito com personagens de outros usuários na nuvem */
-        const finalId=genId();
-        localStorage.setItem(CHAR_PREFIX+finalId, raw);
-        existingIdx.push({id:finalId, name: existingIds.has(c.id) ? c.name+' (importado)' : c.name});
+        let finalId;
+        if(existingIds.has(c.id)){
+          /* o personagem já existe nesta conta: substitui o original pelos dados do backup */
+          finalId=c.id;
+          localStorage.setItem(CHAR_PREFIX+finalId, raw);
+          const ex=existingIdx.find(x=>x.id===finalId);
+          if(ex) ex.name=c.name;
+        } else {
+          /* não existe: cria com id novo (evita conflito com personagens de outros usuários na nuvem) */
+          finalId=genId();
+          localStorage.setItem(CHAR_PREFIX+finalId, raw);
+          existingIdx.push({id:finalId, name:c.name});
+        }
         addPend(finalId);
         if(!firstImportedId) firstImportedId=finalId;
       });
