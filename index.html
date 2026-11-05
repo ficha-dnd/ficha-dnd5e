@@ -297,7 +297,7 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
   </div>
   <div class="toolbar-group">
     <button class="tbtn" style="background:#1a1a3a;color:#8af;border-color:#468;" onclick="exportBackup()">⬇ Backup</button>
-    <label class="tbtn" style="background:#1a1a3a;color:#8af;border-color:#468;margin:0;">⬆ Restaurar<input type="file" accept=".json" onchange="importBackup(this.files[0])" style="display:none;"></label>
+    <label class="tbtn" style="background:#1a1a3a;color:#8af;border-color:#468;margin:0;">⬆ Restaurar<input type="file" accept=".json" onchange="importBackup(this.files[0]);this.value=''" style="display:none;"></label>
   </div>
   <div class="toolbar-group">
     <button class="tbtn" style="background:#1a3a1a;color:#8f8;border-color:#4a6;" onclick="newCharacter()">+ Novo</button>
@@ -1169,6 +1169,7 @@ function importBackup(file){
     try{
       const data=JSON.parse(e.target.result);
       if(!data._index) throw new Error('Formato inválido');
+      if(currentCharId) await saveSheet(true);   /* guarda o que está na tela antes de restaurar */
       const existingIdx=getIndex();
       const existingIds=new Set(existingIdx.map(c=>c.id));
       let firstImportedId=null;
@@ -1203,10 +1204,14 @@ function importBackup(file){
       }
       if(!firstImportedId) throw new Error('Nenhum personagem encontrado no backup');
       setIndex(existingIdx);
-      /* garante que, após recarregar, o personagem importado seja o exibido */
-      localStorage.setItem('dnd5e_force_current', firstImportedId);
-      alert('Backup restaurado! A página será recarregada.');
-      location.reload();
+      /* mostra o personagem restaurado sem recarregar a página */
+      setCurrentCharId(firstImportedId);
+      clearSheet();
+      loadSheet();
+      refreshAfterLoad();
+      renderSelector();
+      for(const id of getPend()) await cloudPush(id);
+      alert('Backup restaurado com sucesso!');
     }catch(err){
       alert('Não foi possível ler o arquivo de backup: '+err.message);
     }
