@@ -126,6 +126,7 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
 .bottom3{display:grid;grid-template-columns:minmax(0,1fr) 203px;gap:5px;margin-top:28px;align-items:start;}
 .pers-col{display:flex;flex-direction:column;gap:8px;}
 .pers-box{border:1.5px solid #000;padding:4px 5px;}
+.pers-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:14px;}
 
 /* ── PAGE 2 ── */
 .bio-layout{display:grid;grid-template-columns:236px minmax(0,1fr);gap:8px;margin-top:6px;}
@@ -620,35 +621,13 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
         <textarea class="big-ta lined-bg" id="equipamento" rows="20"></textarea>
       </div>
 
+      <div class="lined-box">
+        <span class="slabel">Características e Habilidades</span>
+        <textarea class="big-ta lined-bg" id="habilidades" rows="20"></textarea>
+      </div>
+
     </div>
   </div><!-- /main3 -->
-
-  <!-- BOTTOM 3 COLS -->
-  <div class="bottom3">
-    <div class="pers-col">
-      <div class="pers-box">
-        <span class="slabel">Traços de Personalidade</span>
-        <textarea class="big-ta" id="tracos" rows="3"></textarea>
-      </div>
-      <div class="pers-box">
-        <span class="slabel">Ideais</span>
-        <textarea class="big-ta" id="ideais" rows="2"></textarea>
-      </div>
-      <div class="pers-box">
-        <span class="slabel">Ligações</span>
-        <textarea class="big-ta" id="ligacoes" rows="2"></textarea>
-      </div>
-      <div class="pers-box">
-        <span class="slabel">Defeitos</span>
-        <textarea class="big-ta" id="defeitos" rows="2"></textarea>
-      </div>
-    </div>
-
-    <div class="lined-box">
-      <span class="slabel">Características e Habilidades</span>
-      <textarea class="big-ta lined-bg" id="habilidades" rows="20"></textarea>
-    </div>
-  </div>
 
   <div style="text-align:center;font-size:7.1px;color:#999;margin-top:6px;border-top:1px solid #e0e0e0;padding-top:4px;">
     TM &amp; © 2014 Wizards of the Coast LLC. Cópia permitida apenas para uso pessoal.
@@ -719,6 +698,25 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
         <span class="slabel">Tesouro</span>
         <textarea class="big-ta lined-bg" id="tesouro" rows="8"></textarea>
       </div>
+    </div>
+  </div>
+
+  <div class="pers-grid">
+    <div class="pers-box">
+      <span class="slabel">Traços de Personalidade</span>
+      <textarea class="big-ta" id="tracos" rows="7"></textarea>
+    </div>
+    <div class="pers-box">
+      <span class="slabel">Ideais</span>
+      <textarea class="big-ta" id="ideais" rows="7"></textarea>
+    </div>
+    <div class="pers-box">
+      <span class="slabel">Ligações</span>
+      <textarea class="big-ta" id="ligacoes" rows="7"></textarea>
+    </div>
+    <div class="pers-box">
+      <span class="slabel">Defeitos</span>
+      <textarea class="big-ta" id="defeitos" rows="7"></textarea>
     </div>
   </div>
 
