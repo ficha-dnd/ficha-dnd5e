@@ -284,8 +284,8 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
   <div id="ask_box">
     <div id="ask_msg"></div>
     <div id="ask_btns">
-      <div class="ask-opt"><button type="button" id="ask_yes">Sim</button><small>substitui o personagem atual</small></div>
-      <div class="ask-opt"><button type="button" id="ask_no">Não</button><small>cria um novo personagem</small></div>
+      <div class="ask-opt"><button type="button" id="ask_yes">Sim</button><small>Substitui o Personagem Atual</small></div>
+      <div class="ask-opt"><button type="button" id="ask_no">Não</button><small>Cria um Novo Personagem</small></div>
     </div>
   </div>
 </div>
@@ -1121,7 +1121,7 @@ function initCharacters() {
       setCurrentCharId(id);
     }
   } else if (forcedId && idx.some(c => c.id === forcedId)) {
-    /* prioridade 1: personagem recém-restaurado de um backup */
+    /* prioridade 1: personagem forçado por 'dnd5e_force_current' (a restauração não define mais essa chave; mantido por compatibilidade) */
     setCurrentCharId(forcedId);
   } else if (lastId && idx.some(c => c.id === lastId)) {
     /* prioridade 2: último personagem que estava ativo antes de recarregar */
@@ -1133,7 +1133,7 @@ function initCharacters() {
 }
 
 /* ───────── SAVE / LOAD ───────── */
-/* ─── BACKUP: exporta todos os personagens para um arquivo .json ─── */
+/* ─── BACKUP: exporta o personagem atual para um arquivo .json ─── */
 function exportBackup(){
   if(currentCharId) saveSheet(true);
   const idx=getIndex();
