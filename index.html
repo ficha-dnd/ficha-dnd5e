@@ -126,7 +126,18 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
 .bottom3{display:grid;grid-template-columns:minmax(0,1fr) 203px;gap:5px;margin-top:28px;align-items:start;}
 .pers-col{display:flex;flex-direction:column;gap:8px;}
 .pers-box{border:1.5px solid #000;padding:4px 5px;}
-.pers-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:14px;}
+.bio-page{display:flex;flex-direction:column;}
+.bio-page .page-inner{flex:1;display:flex;flex-direction:column;}
+.bio-page .page-inner>*{flex:none;}
+.bio-page .page-inner>.tesouro-wrap{flex:1 1 auto;display:flex;margin-top:14px;min-height:220px;}
+.fill-box{display:flex;flex-direction:column;min-height:0;}
+.fill-box.lined-box{display:flex;}
+.tesouro-wrap .fill-box{flex:1;}
+.fill-ta{flex:1 1 0;min-height:60px;}
+.bio-right .listbox{min-height:270px;}
+.pers-stack{flex:2;display:flex;flex-direction:column;gap:8px;min-height:0;}
+.pers-stack .pers-box{flex:1;display:flex;flex-direction:column;min-height:0;}
+.pers-stack .fill-ta{min-height:44px;}
 
 /* ── PAGE 2 ── */
 .bio-layout{display:grid;grid-template-columns:236px minmax(0,1fr);gap:8px;margin-top:6px;}
@@ -641,7 +652,7 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
      PAGE 2  BIOGRAFIA
 ════════════════════════════════ -->
 <div id="tab-bio" class="tab-content">
-<div class="pages"><div class="page">
+<div class="pages"><div class="page bio-page">
 <div class="page-border"></div>
 <div class="page-inner">
 
@@ -690,33 +701,35 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
           </div>
         </div>
       </div>
-      <div class="lined-box" style="flex:1;">
+      <div class="lined-box fill-box" style="flex:1;">
         <span class="slabel">Outras Características e Habilidades</span>
-        <textarea class="big-ta lined-bg" id="outras_hab" rows="11"></textarea>
+        <textarea class="big-ta lined-bg fill-ta" id="outras_hab" rows="11"></textarea>
       </div>
-      <div class="lined-box" style="flex:1;">
-        <span class="slabel">Tesouro</span>
-        <textarea class="big-ta lined-bg" id="tesouro" rows="8"></textarea>
+      <div class="pers-stack">
+        <div class="pers-box">
+          <span class="slabel">Traços de Personalidade</span>
+          <textarea class="big-ta fill-ta" id="tracos" rows="3"></textarea>
+        </div>
+        <div class="pers-box">
+          <span class="slabel">Ideais</span>
+          <textarea class="big-ta fill-ta" id="ideais" rows="3"></textarea>
+        </div>
+        <div class="pers-box">
+          <span class="slabel">Ligações</span>
+          <textarea class="big-ta fill-ta" id="ligacoes" rows="3"></textarea>
+        </div>
+        <div class="pers-box">
+          <span class="slabel">Defeitos</span>
+          <textarea class="big-ta fill-ta" id="defeitos" rows="3"></textarea>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="pers-grid">
-    <div class="pers-box">
-      <span class="slabel">Traços de Personalidade</span>
-      <textarea class="big-ta" id="tracos" rows="7"></textarea>
-    </div>
-    <div class="pers-box">
-      <span class="slabel">Ideais</span>
-      <textarea class="big-ta" id="ideais" rows="7"></textarea>
-    </div>
-    <div class="pers-box">
-      <span class="slabel">Ligações</span>
-      <textarea class="big-ta" id="ligacoes" rows="7"></textarea>
-    </div>
-    <div class="pers-box">
-      <span class="slabel">Defeitos</span>
-      <textarea class="big-ta" id="defeitos" rows="7"></textarea>
+  <div class="tesouro-wrap">
+    <div class="lined-box fill-box">
+      <span class="slabel">Tesouro</span>
+      <textarea class="big-ta lined-bg fill-ta" id="tesouro" rows="8"></textarea>
     </div>
   </div>
 
