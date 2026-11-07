@@ -126,18 +126,13 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
 .bottom3{display:grid;grid-template-columns:minmax(0,1fr) 203px;gap:5px;margin-top:28px;align-items:start;}
 .pers-col{display:flex;flex-direction:column;gap:8px;}
 .pers-box{border:1.5px solid #000;padding:4px 5px;}
-.bio-page{display:flex;flex-direction:column;}
-.bio-page .page-inner{flex:1;display:flex;flex-direction:column;}
-.bio-page .page-inner>*{flex:none;}
-.bio-page .page-inner>.tesouro-wrap{flex:1 1 auto;display:flex;margin-top:14px;min-height:220px;}
 .fill-box{display:flex;flex-direction:column;min-height:0;}
-.fill-box.lined-box{display:flex;}
-.tesouro-wrap .fill-box{flex:1;}
-.fill-ta{flex:1 1 0;min-height:60px;}
-.bio-right .listbox{min-height:270px;}
-.pers-stack{flex:2;display:flex;flex-direction:column;gap:8px;min-height:0;}
-.pers-stack .pers-box{flex:1;display:flex;flex-direction:column;min-height:0;}
-.pers-stack .fill-ta{min-height:44px;}
+.fill-ta{flex:1 1 0;min-height:60px;margin-bottom:4px;}
+.bio-right .listbox{min-height:255px;}
+#idiomas{margin-bottom:4px;}
+.pers-stack{flex:none;display:flex;flex-direction:column;gap:8px;}
+.pers-stack .pers-box{flex:none;height:80px;display:flex;flex-direction:column;min-height:0;}
+.pers-stack .fill-ta{min-height:30px;}
 
 /* ── PAGE 2 ── */
 .bio-layout{display:grid;grid-template-columns:236px minmax(0,1fr);gap:8px;margin-top:6px;}
@@ -652,7 +647,7 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
      PAGE 2  BIOGRAFIA
 ════════════════════════════════ -->
 <div id="tab-bio" class="tab-content">
-<div class="pages"><div class="page bio-page">
+<div class="pages"><div class="page">
 <div class="page-border"></div>
 <div class="page-inner">
 
@@ -683,13 +678,13 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
         <span style="font-size:9.4px;">(clique para adicionar)</span>
       </div>
       <input type="file" id="portrait_input" accept="image/*" style="display:none">
-      <div class="lined-box" style="flex:1;">
+      <div class="lined-box fill-box" style="flex:1;">
         <span class="slabel">História do Personagem</span>
-        <textarea class="big-ta lined-bg" id="historia" rows="34"></textarea>
+        <textarea class="big-ta lined-bg fill-ta" id="historia" rows="34"></textarea>
       </div>
     </div>
     <div class="bio-right">
-      <div class="listbox" style="flex:1;">
+      <div class="listbox" style="flex:none;">
         <span class="slabel">Aliados e Organizações</span>
         <div class="ally-inner">
           <textarea class="big-ta" id="aliados" rows="10" style="border:1px solid #ddd;padding:3px;"></textarea>
@@ -701,7 +696,7 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
           </div>
         </div>
       </div>
-      <div class="lined-box fill-box" style="flex:1;">
+      <div class="lined-box fill-box" style="flex:1;min-height:330px;">
         <span class="slabel">Outras Características e Habilidades</span>
         <textarea class="big-ta lined-bg fill-ta" id="outras_hab" rows="11"></textarea>
       </div>
@@ -723,15 +718,13 @@ html,body{background:#111;font-family:'Cuprum','Scada',Arial,sans-serif;overflow
           <textarea class="big-ta fill-ta" id="defeitos" rows="3"></textarea>
         </div>
       </div>
+      <div class="lined-box fill-box" style="flex:none;height:262px;">
+        <span class="slabel">Tesouro</span>
+        <textarea class="big-ta lined-bg fill-ta" id="tesouro" rows="8"></textarea>
+      </div>
     </div>
   </div>
 
-  <div class="tesouro-wrap">
-    <div class="lined-box fill-box">
-      <span class="slabel">Tesouro</span>
-      <textarea class="big-ta lined-bg fill-ta" id="tesouro" rows="8"></textarea>
-    </div>
-  </div>
 
   <div style="text-align:center;font-size:7.1px;color:#999;margin-top:6px;border-top:1px solid #e0e0e0;padding-top:4px;">
     TM &amp; © 2014 Wizards of the Coast LLC. Cópia permitida apenas para uso pessoal.
